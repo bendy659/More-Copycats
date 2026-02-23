@@ -1,0 +1,33 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Author by _BENDY659_ (STUPID-AI)",
+	"ambientocclusion": false,
+	"textures": {
+		"0": "create:block/copycat_base",
+		"particle": "create:block/copycat_base"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 13],
+			"to": [16, 16, 15],
+			"rotation": {"x": 0, "y": 90, "z": 0, "origin": [1.5, 14, 14.5]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#0", "cullface": "west"},
+				"east": {"uv": [14, 0, 16, 16], "texture": "#0", "cullface": "south"},
+				"west": {"uv": [0, 0, 2, 16], "texture": "#0", "cullface": "south"},
+				"up": {"uv": [0, 0, 16, 2], "texture": "#0", "cullface": "down"}
+			}
+		},
+		{
+			"from": [-12, 0, 14],
+			"to": [4, 16, 15],
+			"rotation": {"x": 0, "y": -90, "z": 0, "origin": [2.5, 14, 14.5]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"east": {"uv": [15, 0, 16, 16], "texture": "#0", "cullface": "south"},
+				"west": {"uv": [0, 0, 1, 16], "texture": "#0", "cullface": "north"},
+				"up": {"uv": [16, 16, 0, 15], "texture": "#0", "cullface": "down"}
+			}
+		}
+	]
+}

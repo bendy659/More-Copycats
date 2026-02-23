@@ -1,0 +1,21 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "create:block/copycat_base",
+    "all": "create:block/copycat_base"
+  },
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [8, 8, 8],
+      "faces": {
+        "north": {"uv": [0, 0, 8, 8], "texture": "#all"},
+        "east": {"uv": [0, 0, 8, 8], "texture": "#all"},
+        "south": {"uv": [0, 0, 8, 8], "texture": "#all"},
+        "west": {"uv": [0, 0, 8, 8], "texture": "#all"},
+        "up": {"uv": [0, 0, 8, 8], "texture": "#all"},
+        "down": {"uv": [0, 0, 8, 8], "texture": "#all"}
+      }
+    }
+  ]
+}

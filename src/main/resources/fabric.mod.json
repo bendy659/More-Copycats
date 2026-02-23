@@ -1,0 +1,33 @@
+{
+    "schemaVersion": 1,
+    "id": "more_copycats",
+    "version": "${version}",
+    "name": "More-Copycats",
+    "description": "NaN",
+    "authors": [],
+    "contact": {},
+    "license": "All-Rights-Reserved",
+    "icon": "assets/more_copycats/icon.png",
+    "environment": "*",
+    "entrypoints": {
+        "client": [
+            "com.example.more_copycats.client.MoreCopycatsClient"
+        ],
+        "main": [
+            "com.example.more_copycats.MoreCopycats"
+        ]
+    },
+    "mixins": [
+        "more_copycats.mixins.json",
+        {
+            "config": "more_copycats.client.mixins.json",
+            "environment": "client"
+        }
+    ],
+    "depends": {
+        "fabricloader": ">=${loader_version}",
+        "fabric-language-kotlin": ">=${kotlin_loader_version}",
+        "fabric-api": "*",
+        "minecraft": "${minecraft_version}"
+    }
+}

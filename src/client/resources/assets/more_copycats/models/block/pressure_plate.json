@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:block/pressure_plate_up",
+    "textures": {
+        "particle": "create:block/copycat_base",
+        "texture": "create:block/copycat_base"
+    }
+}
