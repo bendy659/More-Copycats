@@ -50,10 +50,8 @@ object CopycatConnectedTextureHelper {
 
             // `state`/`other` are already appearance-resolved by CT behaviour (via getCTBlockState),
             // so multi-slot copycats (wall/fence/etc.) can provide per-face materials.
-            val matA = state
-            val matB = other
-            if (matA.isAir || matB.isAir) return false
-            return matA.block == matB.block
+            if (state.isAir || other.isAir) return false
+            return state.block == other.block
         }
     }
 
@@ -63,10 +61,11 @@ object CopycatConnectedTextureHelper {
         referenceQuad: BakedQuad?,
         world: BlockAndTintGetter,
         pos: BlockPos,
-        @Suppress("UNUSED_PARAMETER") copycatState: BlockState,
+        copycatState: BlockState,
         materialState: BlockState,
         useConnected: Boolean = true
     ): BakedQuad {
+        if (copycatState.isAir) return quad
         if (!useConnected) {
             if (referenceQuad != null) {
                 return remapSprite(quad, referenceQuad.sprite())

@@ -3,6 +3,7 @@ package ru.benos_codex.more_copycats.mixin.create.block.entity;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.zurrtum.create.content.decoration.slidingDoor.SlidingDoorBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import ru.benos_codex.more_copycats.SlidingDoorBlockEntityTypeHelper;
@@ -14,10 +15,12 @@ public class SlidingDoorBlockEntityMixin {
             method = "<init>",
             at = @At(
                     value = "FIELD",
+                    opcode = Opcodes.GETSTATIC,
                     target = "Lcom/zurrtum/create/AllBlockEntityTypes;SLIDING_DOOR:Lnet/minecraft/world/level/block/entity/BlockEntityType;"
             ),
             remap = false
     )
+    @SuppressWarnings("unused")
     private static BlockEntityType<?> more_copycats$redirectBlockEntityType(BlockEntityType<?> original) {
         BlockEntityType<?> override = SlidingDoorBlockEntityTypeHelper.OVERRIDE.get();
         return override != null ? override : original;

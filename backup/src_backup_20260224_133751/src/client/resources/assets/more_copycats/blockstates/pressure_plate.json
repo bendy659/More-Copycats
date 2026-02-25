@@ -1,0 +1,6 @@
+{
+    "variants": {
+        "powered=false": { "model": "more_copycats:block/pressure_plate" },
+        "powered=true" : { "model": "more_copycats:block/pressure_plate" }
+    }
+}

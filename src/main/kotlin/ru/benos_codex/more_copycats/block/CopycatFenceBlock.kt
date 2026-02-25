@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.FenceBlock
 import net.minecraft.world.level.block.FenceGateBlock
 import net.minecraft.world.level.block.LevelEvent
+import net.minecraft.world.level.block.WallBlock
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.state.StateDefinition
@@ -217,7 +218,7 @@ class CopycatFenceBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props
         }
 
         level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.75f, 0.95f)
-        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(removedState))
+        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(removedState))
         return InteractionResult.SUCCESS
     }
 
@@ -255,7 +256,9 @@ class CopycatFenceBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props
 
     private fun connectsTo(neighborState: BlockState, level: BlockGetter, neighborPos: BlockPos, direction: Direction): Boolean {
         val block = neighborState.block
-        if (block is CopycatFenceBlock || block is FenceBlock) return true
+        if (block is CopycatFenceBlock) return true
+        if (block is FenceBlock) return false
+        if (block is CopycatWallBlock || block is WallBlock) return false
         if (block is FenceGateBlock && FenceGateBlock.connectsToDirection(neighborState, direction)) return true
         return neighborState.isFaceSturdy(level, neighborPos, direction.opposite)
     }

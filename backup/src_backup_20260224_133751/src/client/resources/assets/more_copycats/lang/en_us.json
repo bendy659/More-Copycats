@@ -1,0 +1,18 @@
+{
+    "itemGroup.more_copycats": "More Copycats",
+
+    "_blocks": "Blocks-Group",
+    "block.more_copycats.stairs": "Copycat Stairs",
+    "block.more_copycats.vertical_stairs": "Copycat Vertical Stairs",
+    "block.more_copycats.button": "Copycat Button",
+    "block.more_copycats.pressure_plate": "Copycat Pressure Plate",
+    "block.more_copycats.slab": "Copycat Slab",
+    "item.more_copycats.slab_horizontal": "Copycat Slab (Horizontal)",
+    "item.more_copycats.slab_vertical": "Copycat Slab (Vertical)",
+    "block.more_copycats.rod": "Copycat Rod",
+    "block.more_copycats.door": "Copycat Door",
+    "block.more_copycats.sliding_door": "Copycat Sliding Door",
+    "block.more_copycats.trapdoor": "Copycat Trapdoor",
+    "block.more_copycats.fence": "Copycat Fence",
+    "block.more_copycats.wall": "Copycat Wall"
+}

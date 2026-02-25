@@ -36,7 +36,7 @@ import ru.benos_codex.more_copycats.block.entity.CopycatSlidingDoorBlockEntity
 import ru.benos_codex.more_copycats.datapack.CopycatDatapackManager
 
 class CopycatSlidingDoorBlock(props: Properties) :
-    SlidingDoorBlock(props, SlidingDoorBlock.TRAIN_SET_TYPE.get(), false), AppearanceControlBlock {
+    SlidingDoorBlock(props, TRAIN_SET_TYPE.get(), false), AppearanceControlBlock {
 
     @Suppress("UNCHECKED_CAST")
     override fun getBlockEntityClass(): Class<SlidingDoorBlockEntity> = CopycatSlidingDoorBlockEntity::class.java as Class<SlidingDoorBlockEntity>
@@ -52,10 +52,10 @@ class CopycatSlidingDoorBlock(props: Properties) :
         reference: BlockState?,
         fromPos: BlockPos?
     ): BlockState {
-        if (state.hasProperty(SlidingDoorBlock.VISIBLE) && !state.getValue(SlidingDoorBlock.VISIBLE)) {
+        if (state.hasProperty(VISIBLE) && !state.getValue(VISIBLE)) {
             return state
         }
-        val half = if (state.hasProperty(DoorBlock.HALF)) state.getValue(DoorBlock.HALF) else DoubleBlockHalf.LOWER
+        val half = if (state.hasProperty(HALF)) state.getValue(HALF) else DoubleBlockHalf.LOWER
         val be = findDoorBlockEntity(level, toPos, state)
         return be?.getMaterialState(half) ?: AllBlocks.COPYCAT_BASE.defaultBlockState()
     }
@@ -83,7 +83,7 @@ class CopycatSlidingDoorBlock(props: Properties) :
         val material = getAcceptedBlockState(level, pos, stack, hitResult.direction)
             ?: return super.useItemOn(stack, state, level, pos, player, hand, hitResult)
         val be = findDoorBlockEntity(level, pos, state) ?: return super.useItemOn(stack, state, level, pos, player, hand, hitResult)
-        val targetHalf = state.getValue(DoorBlock.HALF)
+        val targetHalf = state.getValue(HALF)
 
         if (level.isClientSide) {
             return InteractionResult.SUCCESS
@@ -126,7 +126,7 @@ class CopycatSlidingDoorBlock(props: Properties) :
         val level = context.level
         val pos = context.clickedPos
         val be = findDoorBlockEntity(level, pos, state) ?: return InteractionResult.PASS
-        val targetHalf = state.getValue(DoorBlock.HALF)
+        val targetHalf = state.getValue(HALF)
         if (!be.hasCustomMaterial(targetHalf)) return InteractionResult.PASS
 
         val player = context.player
@@ -138,7 +138,7 @@ class CopycatSlidingDoorBlock(props: Properties) :
         }
 
         if (!level.isClientSide) {
-            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(removedState))
+            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(removedState))
             be.clearMaterial(targetHalf)
         }
 
@@ -169,16 +169,13 @@ class CopycatSlidingDoorBlock(props: Properties) :
 
     override fun playerWillDestroy(level: Level, pos: BlockPos, state: BlockState, player: Player): BlockState {
         if (player.isCreative) {
-            val be = findDoorBlockEntity(level, pos, state)
-            if (be != null) {
-                be.clearAllMaterials()
-            }
+            findDoorBlockEntity(level, pos, state)?.clearAllMaterials()
         }
         return super.playerWillDestroy(level, pos, state, player)
     }
 
     private fun findDoorBlockEntity(level: BlockAndTintGetter, pos: BlockPos, state: BlockState): CopycatSlidingDoorBlockEntity? {
-        val preferred = if (state.getValue(DoorBlock.HALF) == DoubleBlockHalf.UPPER) pos.below() else pos
+        val preferred = if (state.getValue(HALF) == DoubleBlockHalf.UPPER) pos.below() else pos
         (level.getBlockEntity(preferred) as? CopycatSlidingDoorBlockEntity)?.let { return it }
         (level.getBlockEntity(pos) as? CopycatSlidingDoorBlockEntity)?.let { return it }
         (level.getBlockEntity(pos.below()) as? CopycatSlidingDoorBlockEntity)?.let { return it }

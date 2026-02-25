@@ -51,8 +51,8 @@ class CopycatFenceWallBlockEntity(pos: BlockPos, state: BlockState) : CopycatBlo
     fun setSlotMaterial(slot: Slot, newMaterial: BlockState, sourceStack: ItemStack) {
         when (slot) {
             Slot.PRIMARY -> {
-                setMaterial(newMaterial)
-                setConsumedItem(sourceStack)
+                material = newMaterial
+                consumedItem = sourceStack
             }
 
             Slot.SECONDARY -> {

@@ -3,6 +3,7 @@
 
     "_blocks": "Blocks-Group",
     "block.more_copycats.stairs": "Copycat Stairs",
+    "block.more_copycats.vertical_step": "Copycat Vertical Step",
     "block.more_copycats.vertical_stairs": "Copycat Vertical Stairs",
     "block.more_copycats.button": "Copycat Button",
     "block.more_copycats.pressure_plate": "Copycat Pressure Plate",

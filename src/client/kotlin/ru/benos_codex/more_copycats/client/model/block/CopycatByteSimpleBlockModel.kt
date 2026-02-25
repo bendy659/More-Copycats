@@ -362,14 +362,17 @@ class CopycatByteSimpleBlockModel(state: BlockState, unbaked: BlockStateModel.Un
     private fun getMarginFor(material: BlockState): Int? {
         val blockId = BuiltInRegistries.BLOCK.getKey(material.block)
         val key = blockId.toString()
-        return MARGIN_CACHE.computeIfAbsent(key) {
-            val modelJson = loadJson("${blockId.namespace}:models/block/${blockId.path}.json".rl) ?: return@computeIfAbsent null
-            val parentStr = GsonHelper.getAsString(modelJson, "parent", null) ?: return@computeIfAbsent null
-            val parentLoc = Identifier.parse(parentStr)
-            val metaLoc = "${parentLoc.namespace}:models/${parentLoc.path}.json.mcmeta".rl
-            val metaJson = loadJson(metaLoc) ?: return@computeIfAbsent null
-            GsonHelper.getAsInt(metaJson, "margin", -1).takeIf { it > 0 }
-        }
+        MARGIN_CACHE[key]?.let { return it }
+
+        val modelJson = loadJson("${blockId.namespace}:models/block/${blockId.path}.json".rl) ?: return null
+        val parentStr = GsonHelper.getAsString(modelJson, "parent", null) ?: return null
+        val parentLoc = Identifier.parse(parentStr)
+        val metaLoc = "${parentLoc.namespace}:models/${parentLoc.path}.json.mcmeta".rl
+        val metaJson = loadJson(metaLoc) ?: return null
+        val margin = GsonHelper.getAsInt(metaJson, "margin", -1)
+        if (margin <= 0) return null
+        MARGIN_CACHE[key] = margin
+        return margin
     }
 
     private fun loadJson(loc: Identifier): JsonObject? {
@@ -382,7 +385,7 @@ class CopycatByteSimpleBlockModel(state: BlockState, unbaked: BlockStateModel.Un
     }
 
     private companion object {
-        val MARGIN_CACHE: ConcurrentHashMap<String, Int?> = ConcurrentHashMap()
+        val MARGIN_CACHE: ConcurrentHashMap<String, Int> = ConcurrentHashMap()
         private val DEBUG_SPRITE_ID = "more_copycats:debug_sizing_tex".rl
         private const val DEFAULT_MARGIN = 4
         private const val GRID_SIZE = 2

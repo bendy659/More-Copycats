@@ -10,11 +10,11 @@ import ru.benos_codex.more_copycats.block.CopycatByteBlock
 
 class CopycatByteBlockItem(block: Block, props: Properties) : BlockItem(block, props) {
     override fun place(context: BlockPlaceContext): InteractionResult {
-        CopycatByteBlock.Companion.PLACEMENT_HIT.set(context.clickLocation)
+        CopycatByteBlock.PLACEMENT_HIT.set(context.clickLocation)
         return try {
             super.place(context)
         } finally {
-            CopycatByteBlock.Companion.PLACEMENT_HIT.remove()
+            CopycatByteBlock.PLACEMENT_HIT.remove()
         }
     }
 }

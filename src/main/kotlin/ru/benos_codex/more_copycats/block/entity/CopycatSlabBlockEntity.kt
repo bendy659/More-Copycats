@@ -52,8 +52,8 @@ class CopycatSlabBlockEntity(pos: BlockPos, state: BlockState) : CopycatBlockEnt
             return
         }
 
-        setMaterial(newMaterial)
-        setConsumedItem(sourceStack)
+        material = newMaterial
+        consumedItem = sourceStack
     }
 
     fun clearHalfMaterial(half: SlabType) {

@@ -25,6 +25,7 @@ import net.minecraft.world.level.Level
 import net.minecraft.world.level.LevelReader
 import net.minecraft.world.level.ScheduledTickAccess
 import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.FenceBlock
 import net.minecraft.world.level.block.FenceGateBlock
 import net.minecraft.world.level.block.IronBarsBlock
 import net.minecraft.world.level.block.LevelEvent
@@ -62,8 +63,8 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         private val TALL_SHAPES: Map<Direction, VoxelShape> = Shapes.rotateHorizontal(box(5.0, 0.0, 0.0, 11.0, 16.0, 8.0))
         private val POST_COLLISION_SHAPE: VoxelShape = box(4.0, 0.0, 4.0, 12.0, 24.0, 12.0)
         private val SIDE_COLLISION_SHAPES: Map<Direction, VoxelShape> = Shapes.rotateHorizontal(box(5.0, 0.0, 0.0, 11.0, 24.0, 8.0))
-        private val TEST_SHAPE_POST: VoxelShape = Block.column(2.0, 0.0, 16.0)
-        private val TEST_SHAPES_WALL: Map<Direction, VoxelShape> = Shapes.rotateHorizontal(Block.boxZ(2.0, 16.0, 0.0, 9.0))
+        private val TEST_SHAPE_POST: VoxelShape = column(2.0, 0.0, 16.0)
+        private val TEST_SHAPES_WALL: Map<Direction, VoxelShape> = Shapes.rotateHorizontal(boxZ(2.0, 16.0, 0.0, 9.0))
     }
 
     private enum class Part(val slot: CopycatFenceWallBlockEntity.Slot) {
@@ -86,7 +87,7 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
     override fun getBlockEntityType(): BlockEntityType<out CopycatFenceWallBlockEntity> = MoreCopycatsRegister.FENCE_WALL_BE
 
     override fun canConnectTexturesToward(
-        reader: net.minecraft.world.level.BlockAndTintGetter,
+        reader: BlockAndTintGetter,
         fromPos: BlockPos,
         toPos: BlockPos,
         state: BlockState
@@ -255,7 +256,7 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         }
 
         level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.75f, 0.95f)
-        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(removedState))
+        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(removedState))
         return InteractionResult.SUCCESS
     }
 
@@ -382,17 +383,18 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
 
     private fun connectsTo(neighborState: BlockState, canAttachToSturdyFace: Boolean, direction: Direction): Boolean {
         val block = neighborState.block
+        if (block is CopycatWallBlock) return true
+        if (block is WallBlock) return false
+        if (block is CopycatFenceBlock || block is FenceBlock) return false
         val gateConnects = block is FenceGateBlock && FenceGateBlock.connectsToDirection(neighborState, direction)
-        return neighborState.`is`(BlockTags.WALLS)
-                || block is CopycatWallBlock
-                || (!isExceptionForConnection(neighborState) && canAttachToSturdyFace)
+        return (!isExceptionForConnection(neighborState) && canAttachToSturdyFace)
                 || block is IronBarsBlock
                 || gateConnects
     }
 
     private fun shouldRaisePost(state: BlockState, aboveState: BlockState, aboveDownFace: VoxelShape): Boolean {
         val blockAbove = aboveState.block
-        val aboveWallWithPost = (blockAbove is WallBlock || blockAbove is CopycatWallBlock) && aboveState.getValue(UP)
+        val aboveWallWithPost = blockAbove is CopycatWallBlock && aboveState.getValue(UP)
         if (aboveWallWithPost) return true
 
         val north = state.getValue(NORTH_WALL)

@@ -1,0 +1,7 @@
+{
+    "parent": "minecraft:item/generated",
+    "textures": {
+        "particle": "more_copycats:item/copycat_door",
+        "layer0": "more_copycats:item/copycat_door"
+    }
+}

@@ -215,7 +215,7 @@ class CopycatSlabBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         }
     }
 
-    override fun useItemOn(
+    public override fun useItemOn(
         stack: ItemStack,
         state: BlockState,
         level: Level,
@@ -293,7 +293,7 @@ class CopycatSlabBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         }
 
         level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 0.75f, 0.95f)
-        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(removedState))
+        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(removedState))
         return InteractionResult.SUCCESS
     }
 
@@ -306,6 +306,21 @@ class CopycatSlabBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
 
     override fun getFluidState(state: BlockState): FluidState {
         return if (state.getValue(WATERLOGGED)) Fluids.WATER.getSource(false) else super.getFluidState(state)
+    }
+
+    override fun getLuminance(world: BlockGetter, pos: BlockPos): Int {
+        val state = world.getBlockState(pos)
+        if (!state.`is`(this)) return super.getLuminance(world, pos)
+
+        val be = world.getBlockEntity(pos) as? CopycatSlabBlockEntity ?: return super.getLuminance(world, pos)
+        return when (state.getValue(TYPE)) {
+            SlabType.BOTTOM -> be.getHalfMaterial(SlabType.BOTTOM).lightEmission
+            SlabType.TOP -> be.getHalfMaterial(SlabType.TOP).lightEmission
+            SlabType.DOUBLE -> maxOf(
+                be.getHalfMaterial(SlabType.BOTTOM).lightEmission,
+                be.getHalfMaterial(SlabType.TOP).lightEmission
+            )
+        }
     }
 
     override fun placeLiquid(level: LevelAccessor, pos: BlockPos, state: BlockState, fluidState: FluidState): Boolean {

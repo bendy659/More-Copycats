@@ -1,4 +1,4 @@
-package ru.benos.more_copycats
+package ru.benos_codex.more_copycats
 
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.loader.api.FabricLoader
@@ -7,8 +7,10 @@ import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.BlockState
 import java.util.Properties
-import ru.benos.more_copycats.network.UvToolNetworking
+import ru.benos_codex.more_copycats.datapack.CopycatDatapackManager
+import ru.benos_codex.more_copycats.network.UvToolNetworking
 
+@Suppress("unused")
 object MoreCopycats : ModInitializer {
     val String.rl: Identifier get() = Identifier.parse(this)
     val String.mrl: Identifier get() = "more_copycats:$this".rl
@@ -38,6 +40,7 @@ object MoreCopycats : ModInitializer {
 
     override fun onInitialize() {
         Config.load()
+        CopycatDatapackManager.init()
         MoreCopycatsRegister.init
         UvToolNetworking.init()
     }

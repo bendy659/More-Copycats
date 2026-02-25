@@ -120,19 +120,17 @@ class CopycatUvToolScreen(
             val labelY = baseLabelY + step * i
             val fieldY = baseFieldY + step * i
             val box = EditBox(font, leftPos + FIELD_X + 1, topPos + fieldY + 1, FIELD_W, FIELD_H, Component.empty())
-            box.setBordered(false)
+            box.isBordered = false
             box.setTextColor(TEXT_COLOR)
             box.setTextColorUneditable(TEXT_COLOR)
             box.setMaxLength(3)
-            box.setValue(
-                when (i) {
-                    0 -> init.u.toString()
-                    1 -> init.v.toString()
-                    2 -> init.w.toString()
-                    3 -> init.h.toString()
-                    else -> "0"
-                }
-            )
+            box.value = when (i) {
+                0 -> init.u.toString()
+                1 -> init.v.toString()
+                2 -> init.w.toString()
+                3 -> init.h.toString()
+                else -> "0"
+            }
             addRenderableWidget(box)
             fields.add(FieldEntry(label, LABEL_X, labelY, box))
         }
@@ -409,7 +407,7 @@ class CopycatUvToolScreen(
 
     private fun setFieldValue(index: Int, value: String) {
         if (index in fields.indices) {
-            fields[index].box.setValue(value)
+            fields[index].box.value = value
         }
     }
 
@@ -648,26 +646,24 @@ class CopycatUvToolScreen(
             val midW = (w - corner * 2).coerceAtLeast(0)
             val midH = (h - corner * 2).coerceAtLeast(0)
 
-            val uLeft = u
             val uMid = u + corner + gap
             val uRight = u + corner + gap + midTexW + gap
-            val vTop = v
             val vMid = v + corner + gap
             val vBottom = v + corner + gap + midTexH + gap
 
             // corners
-            blitUi(gui, x, y, uLeft, vTop, corner, corner)
-            blitUi(gui, x + w - corner, y, uRight, vTop, corner, corner)
-            blitUi(gui, x, y + h - corner, uLeft, vBottom, corner, corner)
+            blitUi(gui, x, y, u, v, corner, corner)
+            blitUi(gui, x + w - corner, y, uRight, v, corner, corner)
+            blitUi(gui, x, y + h - corner, u, vBottom, corner, corner)
             blitUi(gui, x + w - corner, y + h - corner, uRight, vBottom, corner, corner)
 
             // edges
             if (midW > 0) {
-                blitRepeat(gui, x + corner, y, midW, corner, uMid, vTop, midTexW, corner)
+                blitRepeat(gui, x + corner, y, midW, corner, uMid, v, midTexW, corner)
                 blitRepeat(gui, x + corner, y + h - corner, midW, corner, uMid, vBottom, midTexW, corner)
             }
             if (midH > 0) {
-                blitRepeat(gui, x, y + corner, corner, midH, uLeft, vMid, corner, midTexH)
+                blitRepeat(gui, x, y + corner, corner, midH, u, vMid, corner, midTexH)
                 blitRepeat(gui, x + w - corner, y + corner, corner, midH, uRight, vMid, corner, midTexH)
             }
 

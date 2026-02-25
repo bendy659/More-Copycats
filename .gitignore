@@ -117,3 +117,6 @@ runs/
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
+/.original-copycats_plus-source/
+/.analize-result/
+/.gradle-user/

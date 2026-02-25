@@ -32,7 +32,7 @@ class CopycatPressurePlateBlockModel(state: BlockState, unbaked: BlockStateModel
         val templateParts = mutableListOf<BlockModelPart>()
         model.collectParts(random, templateParts)
 
-        val progress = resolveProgress(world, pos, state)
+        resolveProgress(world, pos, state)
         val dy = 0f
 
         for (templatePart in templateParts) {

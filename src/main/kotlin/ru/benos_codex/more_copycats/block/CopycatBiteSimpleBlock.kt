@@ -23,7 +23,7 @@ import ru.benos_codex.more_copycats.block.entity.CopycatBiteBlockEntity
 
 class CopycatBiteSimpleBlock(props: Properties) : CopycatBiteBlock(props) {
 
-    override fun getBlockEntityType(): BlockEntityType<out CopycatBlockEntity>? =
+    override fun getBlockEntityType(): BlockEntityType<out CopycatBlockEntity> =
         MoreCopycatsRegister.BITE_SIMPLE_BE
 
     override fun useItemOn(
@@ -84,7 +84,7 @@ class CopycatBiteSimpleBlock(props: Properties) : CopycatBiteBlock(props) {
             }
 
             level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1f, 1f)
-            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state))
+            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(state))
             level.removeBlock(pos, false)
             return InteractionResult.SUCCESS
         }
@@ -96,7 +96,7 @@ class CopycatBiteSimpleBlock(props: Properties) : CopycatBiteBlock(props) {
         player.inventory.placeItemBackInInventory(ItemStack(this.asItem()))
         level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 0.75f, 1.2f)
         be.removePart(index)
-        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(DEFAULT_MATERIAL))
+        level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(DEFAULT_MATERIAL))
 
         if (be.isEmpty) {
             level.setBlock(pos, DEFAULT_MATERIAL, 3)

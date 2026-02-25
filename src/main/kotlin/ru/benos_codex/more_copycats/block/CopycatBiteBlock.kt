@@ -194,7 +194,7 @@ open class CopycatBiteBlock(props: Properties) : CopycatBlock(props) {
             }
 
             level.playSound(null, pos, SoundEvents.STONE_BREAK, SoundSource.BLOCKS, 1f, 1f)
-            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state))
+            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(state))
             level.removeBlock(pos, false)
             return InteractionResult.SUCCESS
         }
@@ -209,7 +209,7 @@ open class CopycatBiteBlock(props: Properties) : CopycatBlock(props) {
                 val removedState = be.getFaceState(index, face) ?: DEFAULT_MATERIAL
                 level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1f, 1f)
                 be.clearMaterialFace(index, face)
-                level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(removedState))
+                level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(removedState))
                 return InteractionResult.SUCCESS
             } else {
                 player.inventory.placeItemBackInInventory(ItemStack(this))
@@ -217,7 +217,7 @@ open class CopycatBiteBlock(props: Properties) : CopycatBlock(props) {
                 be.removePart(index)
             }
 
-            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(DEFAULT_MATERIAL))
+            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, getId(DEFAULT_MATERIAL))
 
             if (be.isEmpty) {
                 level.setBlock(pos, DEFAULT_MATERIAL, 3)

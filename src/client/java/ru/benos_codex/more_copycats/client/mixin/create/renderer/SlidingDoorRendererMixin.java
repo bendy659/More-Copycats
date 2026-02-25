@@ -30,13 +30,14 @@ import java.util.List;
 public class SlidingDoorRendererMixin {
 
     @Redirect(
-            method = "extractRenderState",
+            method = "extractRenderState(Lcom/zurrtum/create/content/decoration/slidingDoor/SlidingDoorBlockEntity;Lcom/zurrtum/create/client/content/decoration/slidingDoor/SlidingDoorRenderer$DoorRenderState;FLnet/minecraft/world/phys/Vec3;Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V",
             at = @At(
                     value = "INVOKE",
                     target = "Lcom/zurrtum/create/client/catnip/render/CachedBuffers;block(Lnet/minecraft/world/level/block/state/BlockState;)Lcom/zurrtum/create/client/catnip/render/SuperByteBuffer;"
             ),
             remap = false
     )
+    @SuppressWarnings("unused")
     private SuperByteBuffer more_copycats$renderCopycatSlidingDoorMaterial(
             BlockState toRender,
             SlidingDoorBlockEntity be,
