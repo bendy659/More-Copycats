@@ -1,6 +1,0 @@
-accessWidener v2 named
-
-# Camera#position: Vec3
-accessible field net/minecraft/client/Camera position Lnet/minecraft/world/phys/Vec3;
-
-accessible field net/minecraft/server/level/ServerPlayer server Lnet/minecraft/server/MinecraftServer;
