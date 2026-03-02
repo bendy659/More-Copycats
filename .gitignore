@@ -121,3 +121,7 @@ runs/
 /.analize-result/
 /.gradle-user/
 /backup/
+/AGENTS.md
+/.tmp-create-src/
+/.tmp-src/
+/backup/
