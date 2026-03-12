@@ -122,3 +122,4 @@ runs/
 /.gradle-user/
 /backup/
 /AGENTS.md
+/.tmp-create-src/
