@@ -12,10 +12,10 @@
     "environment": "*",
     "entrypoints": {
         "client": [ { "adapter": "kotlin", "value": "ru.benos_codex.more_copycats.client.MoreCopycatsClient" } ],
-        "main": [ { "adapter": "kotlin", "value": "ru.benos_codex.more_copycats.MoreCopycats" } ]
+        "main"  : [ { "adapter": "kotlin", "value": "ru.benos_codex.more_copycats.MoreCopycats"              } ]
     },
     "mixins": [
-        "more_copycats.mixins.json",
+        { "config": "more_copycats.mixins.json",        "environment": "*"      },
         { "config": "more_copycats.client.mixins.json", "environment": "client" }
     ],
     "depends": {

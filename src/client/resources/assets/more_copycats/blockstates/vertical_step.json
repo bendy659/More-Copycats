@@ -1,13 +1,20 @@
 {
-    "variants": {
-        "facing=north,half=bottom": { "model": "create:block/copycat_base/step", "x": 90,  "y": 180 },
-        "facing=east,half=bottom":  { "model": "create:block/copycat_base/step", "x": 90,  "y": 270 },
-        "facing=south,half=bottom": { "model": "create:block/copycat_base/step", "x": 90,  "y": 0 },
-        "facing=west,half=bottom":  { "model": "create:block/copycat_base/step", "x": 90,  "y": 90 },
-
-        "facing=north,half=top": { "model": "create:block/copycat_base/step", "x": 270, "y": 180 },
-        "facing=east,half=top":  { "model": "create:block/copycat_base/step", "x": 270, "y": 270 },
-        "facing=south,half=top": { "model": "create:block/copycat_base/step", "x": 270, "y": 0 },
-        "facing=west,half=top":  { "model": "create:block/copycat_base/step", "x": 270, "y": 90 }
-    }
+    "multipart": [
+        {
+            "when": { "p0": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "p1": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "y": -90, "uvlock": true }
+        },
+        {
+            "when": { "p2": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "y": 90, "uvlock": true }
+        },
+        {
+            "when": { "p3": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "y": 0, "uvlock": true }
+        }
+    ]
 }

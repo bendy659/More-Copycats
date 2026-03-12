@@ -55,11 +55,21 @@ class CopycatByteSimpleBlock(props: Properties) : CopycatByteBlock(props) {
             return InteractionResult.PASS
         }
 
-        val material = getAcceptedBlockState(level, pos, stack, null)
+        val material = getAcceptedBlockState(level, pos, stack, hitResult.direction)
         if (material != null) {
             if (be.isEmpty) return InteractionResult.PASS
             val index = getTargetIndex(hitResult.location, pos, hitResult.direction, false, be) ?: return InteractionResult.CONSUME
             if (be.isPartEmpty(index)) return InteractionResult.CONSUME
+            val face = hitResult.direction
+
+            if (be.isFaceHasMaterial(index, face)) {
+                if (level.isClientSide) return InteractionResult.SUCCESS
+                if (!be.cycleMaterialFace(index, face)) return InteractionResult.TRY_WITH_EMPTY_HAND
+                val cycled = be.getFaceState(index, face) ?: return InteractionResult.TRY_WITH_EMPTY_HAND
+                be.setMaterialAllFaces(index, cycled)
+                level.playSound(null, pos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS, 0.75f, 0.95f)
+                return InteractionResult.SUCCESS
+            }
 
             if (level.isClientSide) return InteractionResult.SUCCESS
             be.setMaterialAllFaces(index, material)

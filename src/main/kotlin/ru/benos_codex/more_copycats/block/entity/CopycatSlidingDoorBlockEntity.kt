@@ -16,16 +16,25 @@ class CopycatSlidingDoorBlockEntity(pos: BlockPos, state: BlockState) : SlidingD
     private var lowerConsumedItem: ItemStack = ItemStack.EMPTY
     private var upperConsumedItem: ItemStack = ItemStack.EMPTY
 
-    fun getMaterialState(half: DoubleBlockHalf): BlockState =
+    private fun getStoredMaterialState(half: DoubleBlockHalf): BlockState =
         if (half == DoubleBlockHalf.UPPER) upperMaterial else lowerMaterial
+
+    fun getMaterialState(half: DoubleBlockHalf): BlockState =
+        MaterialStateResolver.resolve(level, worldPosition, blockState, getStoredMaterialState(half))
 
     fun getMaterialState(): BlockState = getMaterialState(DoubleBlockHalf.LOWER)
 
     fun hasCustomMaterial(half: DoubleBlockHalf): Boolean =
-        !getMaterialState(half).`is`(AllBlocks.COPYCAT_BASE)
+        !getStoredMaterialState(half).`is`(AllBlocks.COPYCAT_BASE)
 
     fun hasCustomMaterial(): Boolean =
         hasCustomMaterial(DoubleBlockHalf.LOWER) || hasCustomMaterial(DoubleBlockHalf.UPPER)
+
+    fun getMaxLightEmission(): Int =
+        maxOf(
+            getMaterialState(DoubleBlockHalf.LOWER).lightEmission,
+            getMaterialState(DoubleBlockHalf.UPPER).lightEmission
+        )
 
     fun getConsumedItemStack(half: DoubleBlockHalf): ItemStack =
         if (half == DoubleBlockHalf.UPPER) upperConsumedItem else lowerConsumedItem
@@ -90,7 +99,7 @@ class CopycatSlidingDoorBlockEntity(pos: BlockPos, state: BlockState) : SlidingD
     }
 
     fun cycleMaterial(half: DoubleBlockHalf): Boolean {
-        val current = getMaterialState(half)
+        val current = getStoredMaterialState(half)
         if (current.`is`(AllBlocks.COPYCAT_BASE)) return false
         val cycled = rotateMaterial(current) ?: return false
 
@@ -120,9 +129,6 @@ class CopycatSlidingDoorBlockEntity(pos: BlockPos, state: BlockState) : SlidingD
             current.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_AXIS) ->
                 current.cycle(net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_AXIS)
 
-            current.hasProperty(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT) ->
-                current.cycle(net.minecraft.world.level.block.state.properties.BlockStateProperties.LIT)
-
             else -> null
         }
     }
@@ -137,7 +143,7 @@ class CopycatSlidingDoorBlockEntity(pos: BlockPos, state: BlockState) : SlidingD
         }
 
         val lowerState = currentLevel.getBlockState(lowerPos)
-        currentLevel.sendBlockUpdated(lowerPos, lowerState, lowerState, 8)
+        MaterialLightHelper.refresh(currentLevel, lowerPos, lowerState, 8)
 
         val upperPos = lowerPos.above()
         val upperState = currentLevel.getBlockState(upperPos)
@@ -145,7 +151,7 @@ class CopycatSlidingDoorBlockEntity(pos: BlockPos, state: BlockState) : SlidingD
             upperState.hasProperty(DoorBlock.HALF) &&
             upperState.getValue(DoorBlock.HALF) == DoubleBlockHalf.UPPER
         ) {
-            currentLevel.sendBlockUpdated(upperPos, upperState, upperState, 8)
+            MaterialLightHelper.refresh(currentLevel, upperPos, upperState, 8)
         }
     }
 

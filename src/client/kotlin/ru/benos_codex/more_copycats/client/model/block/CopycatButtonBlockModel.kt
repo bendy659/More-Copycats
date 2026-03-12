@@ -1,5 +1,6 @@
 package ru.benos_codex.more_copycats.client.model.block
 
+import com.zurrtum.create.AllBlocks
 import com.zurrtum.create.client.infrastructure.model.CopycatModel
 import com.zurrtum.create.client.model.NormalsBakedQuad
 import com.zurrtum.create.content.decoration.copycat.CopycatBlock
@@ -29,7 +30,11 @@ class CopycatButtonBlockModel(state: BlockState, unbaked: BlockStateModel.Unbake
         random: RandomSource,
         parts: MutableList<BlockModelPart>
     ) {
-        val refs = collectMaterialReferences(world, pos, material, random)
+        val hasCustom = !material.`is`(AllBlocks.COPYCAT_BASE)
+        val debugMaterial = MaterialSlotDebug.single(material)
+        val refs = MaterialSlotDebug.references(0, hasCustom) {
+            collectMaterialReferences(world, pos, it, random)
+        } ?: collectMaterialReferences(world, pos, debugMaterial, random)
         val templateParts = mutableListOf<BlockModelPart>()
         model.collectParts(random, templateParts)
 
@@ -38,8 +43,12 @@ class CopycatButtonBlockModel(state: BlockState, unbaked: BlockStateModel.Unbake
 
         for (templatePart in templateParts) {
             val builder = QuadCollection.Builder()
-            addPartRemapped(templatePart, builder, refs, block, state, material, world, pos, dx, dy, dz)
-            parts += SimpleModelWrapper(builder.build(), templatePart.useAmbientOcclusion(), templatePart.particleIcon())
+            addPartRemapped(templatePart, builder, refs, block, state, debugMaterial, world, pos, dx, dy, dz)
+            parts += SimpleModelWrapper(
+                builder.build(),
+                MaterialSlotDebug.ambientOcclusion(templatePart.useAmbientOcclusion()),
+                templatePart.particleIcon()
+            )
         }
     }
 

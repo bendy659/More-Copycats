@@ -3,7 +3,10 @@
 
     "_blocks": "Blocks-Group",
     "block.more_copycats.stairs": "Copycat Stairs",
+    "block.more_copycats.step": "Copycat Step",
     "block.more_copycats.vertical_step": "Copycat Vertical Step",
+    "item.more_copycats.step": "Copycat Step",
+    "item.more_copycats.vertical_step": "Copycat Vertical Step",
     "block.more_copycats.vertical_stairs": "Copycat Vertical Stairs",
     "block.more_copycats.button": "Copycat Button",
     "block.more_copycats.pressure_plate": "Copycat Pressure Plate",
@@ -15,5 +18,12 @@
     "block.more_copycats.sliding_door": "Copycat Sliding Door",
     "block.more_copycats.trapdoor": "Copycat Trapdoor",
     "block.more_copycats.fence": "Copycat Fence",
-    "block.more_copycats.wall": "Copycat Wall"
+    "block.more_copycats.wall": "Copycat Wall",
+    "block.more_copycats.cogwheel": "Copycat Cogwheel",
+    "block.more_copycats.encased_cogwheel": "Copycat Encased Cogwheel",
+    "block.more_copycats.shaft": "Copycat Shaft",
+    "block.more_copycats.encased_shaft": "Copycat Encased Shaft",
+    "block.more_copycats.gearbox": "Copycat Gearbox",
+    "item.more_copycats.vertical_gearbox": "Copycat Vertical Gearbox",
+    "block.more_copycats.andesite_encased_cogwheel": "Copycat Andesite Encased Cogwheel"
 }

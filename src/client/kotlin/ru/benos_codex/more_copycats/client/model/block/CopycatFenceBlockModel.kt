@@ -12,6 +12,7 @@ import net.minecraft.core.Direction
 import net.minecraft.util.RandomSource
 import net.minecraft.world.level.BlockAndTintGetter
 import net.minecraft.world.level.block.state.BlockState
+import ru.benos_codex.more_copycats.block.CopycatFenceBlock
 import ru.benos_codex.more_copycats.block.entity.CopycatFenceWallBlockEntity
 
 class CopycatFenceBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedRoot) : CopycatModel(state, unbaked) {
@@ -25,30 +26,36 @@ class CopycatFenceBlockModel(state: BlockState, unbaked: BlockStateModel.Unbaked
         parts: MutableList<BlockModelPart>
     ) {
         val blockEntity = world.getBlockEntity(pos) as? CopycatFenceWallBlockEntity
-        val centerMaterial = blockEntity?.getSlotMaterial(CopycatFenceWallBlockEntity.Slot.PRIMARY) ?: material
-        val topMaterial = blockEntity?.getSlotMaterial(CopycatFenceWallBlockEntity.Slot.SECONDARY) ?: centerMaterial
-        val bottomMaterial = blockEntity?.getSlotMaterial(CopycatFenceWallBlockEntity.Slot.TERTIARY) ?: centerMaterial
-
-        val refsBySlot = mapOf(
-            CopycatFenceWallBlockEntity.Slot.PRIMARY to collectMaterialReferences(world, pos, centerMaterial, random),
-            CopycatFenceWallBlockEntity.Slot.SECONDARY to collectMaterialReferences(world, pos, topMaterial, random),
-            CopycatFenceWallBlockEntity.Slot.TERTIARY to collectMaterialReferences(world, pos, bottomMaterial, random)
-        )
-
-        val materialsBySlot = mapOf(
-            CopycatFenceWallBlockEntity.Slot.PRIMARY to centerMaterial,
-            CopycatFenceWallBlockEntity.Slot.SECONDARY to topMaterial,
-            CopycatFenceWallBlockEntity.Slot.TERTIARY to bottomMaterial
-        )
+        val postFallback = blockEntity?.getSlotMaterial(CopycatFenceWallBlockEntity.FenceSlot.POST) ?: material
+        val materialsBySlot = buildMap {
+            for (slot in CopycatFenceWallBlockEntity.FenceSlot.entries) {
+                val hasCustom = blockEntity?.hasCustomMaterial(slot) == true
+                val actualMaterial = if (hasCustom) blockEntity.getSlotMaterial(slot) else postFallback
+                put(slot, MaterialSlotDebug.material(slot.ordinal, hasCustom, actualMaterial))
+            }
+        }
+        val refsBySlot = buildMap {
+            for (slot in CopycatFenceWallBlockEntity.FenceSlot.entries) {
+                val hasCustom = blockEntity?.hasCustomMaterial(slot) == true
+                val materialForRefs = materialsBySlot.getValue(slot)
+                val refs = MaterialSlotDebug.references(slot.ordinal, hasCustom) {
+                    collectMaterialReferences(world, pos, it, random)
+                } ?: collectMaterialReferences(world, pos, materialForRefs, random)
+                put(slot, refs)
+            }
+        }
 
         val templateParts = mutableListOf<BlockModelPart>()
         model.collectParts(random, templateParts)
 
         for (templatePart in templateParts) {
-            val fixedSlot = pickPartSlot(templatePart)
             val builder = QuadCollection.Builder()
-            addPartRemapped(templatePart, fixedSlot, builder, refsBySlot, materialsBySlot, block, state, world, pos)
-            parts += SimpleModelWrapper(builder.build(), templatePart.useAmbientOcclusion(), templatePart.particleIcon())
+            addPartRemapped(templatePart, builder, refsBySlot, materialsBySlot, block, state, world, pos)
+            parts += SimpleModelWrapper(
+                builder.build(),
+                MaterialSlotDebug.ambientOcclusion(templatePart.useAmbientOcclusion()),
+                templatePart.particleIcon()
+            )
         }
     }
 
@@ -85,28 +92,29 @@ class CopycatFenceBlockModel(state: BlockState, unbaked: BlockStateModel.Unbaked
 
     private fun addPartRemapped(
         templatePart: BlockModelPart,
-        fixedSlot: CopycatFenceWallBlockEntity.Slot?,
         builder: QuadCollection.Builder,
-        refsBySlot: Map<CopycatFenceWallBlockEntity.Slot, Map<Direction, BakedQuad>>,
-        materialsBySlot: Map<CopycatFenceWallBlockEntity.Slot, BlockState>,
+        refsBySlot: Map<CopycatFenceWallBlockEntity.FenceSlot, Map<Direction, BakedQuad>>,
+        materialsBySlot: Map<CopycatFenceWallBlockEntity.FenceSlot, BlockState>,
         block: CopycatBlock,
         state: BlockState,
         world: BlockAndTintGetter,
         pos: BlockPos
     ) {
         for (quad in templatePart.getQuads(null)) {
-            val slot = fixedSlot ?: pickSlot(quad)
+            val slot = pickSlot(quad, state)
             val refs = refsBySlot[slot].orEmpty()
-            val material = materialsBySlot[slot] ?: materialsBySlot.getValue(CopycatFenceWallBlockEntity.Slot.PRIMARY)
+            val material = materialsBySlot[slot] ?: materialsBySlot.getValue(CopycatFenceWallBlockEntity.FenceSlot.POST)
             val ref = refs[quad.direction()]
-            builder.addUnculledFace(CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material))
+            val remapped = CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material)
+            if (CopycatQuadCulling.isOnOuterBoundary(quad, quad.direction())) builder.addCulledFace(quad.direction(), remapped)
+            else builder.addUnculledFace(remapped)
         }
 
         for (direction in Direction.entries) {
             for (quad in templatePart.getQuads(direction)) {
-                val slot = fixedSlot ?: pickSlot(quad)
+                val slot = pickSlot(quad, state)
                 val refs = refsBySlot[slot].orEmpty()
-                val material = materialsBySlot[slot] ?: materialsBySlot.getValue(CopycatFenceWallBlockEntity.Slot.PRIMARY)
+                val material = materialsBySlot[slot] ?: materialsBySlot.getValue(CopycatFenceWallBlockEntity.FenceSlot.POST)
                 val ref = refs[direction]
                 val remapped = CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material)
                 if (block.shouldFaceAlwaysRender(state, direction)) builder.addUnculledFace(remapped)
@@ -115,60 +123,70 @@ class CopycatFenceBlockModel(state: BlockState, unbaked: BlockStateModel.Unbaked
         }
     }
 
-    private fun pickPartSlot(part: BlockModelPart): CopycatFenceWallBlockEntity.Slot? {
-        var minY = Float.POSITIVE_INFINITY
-        var maxY = Float.NEGATIVE_INFINITY
-
-        fun include(quad: BakedQuad) {
-            minY = minOf(minY, quad.position0().y(), quad.position1().y(), quad.position2().y(), quad.position3().y())
-            maxY = maxOf(maxY, quad.position0().y(), quad.position1().y(), quad.position2().y(), quad.position3().y())
-        }
-
-        for (quad in part.getQuads(null)) include(quad)
-        for (dir in Direction.entries) {
-            for (quad in part.getQuads(dir)) include(quad)
-        }
-
-        if (!minY.isFinite() || !maxY.isFinite()) return CopycatFenceWallBlockEntity.Slot.PRIMARY
-
-        val scale = if (kotlin.math.max(kotlin.math.abs(minY), kotlin.math.abs(maxY)) > 2.0f) 16.0f else 1.0f
-        val eps = scale / 256.0f
-        val railBottomMin = (7.0f / 16.0f) * scale
-        val railBottomMax = (10.0f / 16.0f) * scale
-        val railTopMin = (12.0f / 16.0f) * scale
-        val railTopMax = (15.0f / 16.0f) * scale
-
-        if (minY >= railBottomMin - eps && maxY <= railBottomMax + eps) {
-            return CopycatFenceWallBlockEntity.Slot.TERTIARY
-        }
-        if (minY >= railTopMin - eps && maxY <= railTopMax + eps) {
-            return CopycatFenceWallBlockEntity.Slot.SECONDARY
-        }
-
-        val spansBothRails = minY <= railBottomMax + eps && maxY >= railTopMin - eps
-        return if (spansBothRails) null else CopycatFenceWallBlockEntity.Slot.PRIMARY
-    }
-
-    private fun pickSlot(quad: BakedQuad): CopycatFenceWallBlockEntity.Slot {
+    private fun pickSlot(
+        quad: BakedQuad,
+        state: BlockState
+    ): CopycatFenceWallBlockEntity.FenceSlot {
         val ys = floatArrayOf(quad.position0().y(), quad.position1().y(), quad.position2().y(), quad.position3().y())
+        val xs = floatArrayOf(quad.position0().x(), quad.position1().x(), quad.position2().x(), quad.position3().x())
+        val zs = floatArrayOf(quad.position0().z(), quad.position1().z(), quad.position2().z(), quad.position3().z())
         val minY = ys.minOrNull() ?: 0f
         val maxY = ys.maxOrNull() ?: 0f
-        val ysMaxAbs = maxOf(kotlin.math.abs(minY), kotlin.math.abs(maxY))
-        val scale = if (ysMaxAbs > 2.0f) 16.0f else 1.0f
-        val eps = scale / 256.0f
+        val minX = xs.minOrNull() ?: 0f
+        val maxX = xs.maxOrNull() ?: 0f
+        val minZ = zs.minOrNull() ?: 0f
+        val maxZ = zs.maxOrNull() ?: 0f
+        val scale = if (maxOf(kotlin.math.abs(minX), kotlin.math.abs(maxX), kotlin.math.abs(minZ), kotlin.math.abs(maxZ), kotlin.math.abs(minY), kotlin.math.abs(maxY)) > 2.0f) 16.0f else 1.0f
+        val centerMin = 6.0f / 16.0f * scale
+        val centerMax = 10.0f / 16.0f * scale
+        val topMin = 12.0f / 16.0f * scale
+        val topMax = 15.0f / 16.0f * scale
+        val bottomMin = 7.0f / 16.0f * scale
+        val bottomMax = 10.0f / 16.0f * scale
+        val eps = scale / 512.0f
 
-        val railBottomMin = (7.0f / 16.0f) * scale
-        val railBottomMax = (10.0f / 16.0f) * scale
-        val railTopMin = (12.0f / 16.0f) * scale
-        val railTopMax = (15.0f / 16.0f) * scale
+        val bestDirection = listOf(
+            Direction.NORTH to (centerMin - minZ).coerceAtLeast(0f),
+            Direction.EAST to (maxX - centerMax).coerceAtLeast(0f),
+            Direction.SOUTH to (maxZ - centerMax).coerceAtLeast(0f),
+            Direction.WEST to (centerMin - minX).coerceAtLeast(0f)
+        ).maxByOrNull { it.second }
 
-        // Strict by current fence model rails: only y in [7..10] or [12..15] belongs to rails.
-        if (minY >= railBottomMin - eps && maxY <= railBottomMax + eps) {
-            return CopycatFenceWallBlockEntity.Slot.TERTIARY
+        if (bestDirection != null && bestDirection.second > eps && state.getValue(connectionProperty(bestDirection.first))) {
+            return when {
+                minY >= topMin - eps && maxY <= topMax + eps -> topSlot(bestDirection.first)
+                minY >= bottomMin - eps && maxY <= bottomMax + eps -> bottomSlot(bestDirection.first)
+                else -> CopycatFenceWallBlockEntity.FenceSlot.POST
+            }
         }
-        if (minY >= railTopMin - eps && maxY <= railTopMax + eps) {
-            return CopycatFenceWallBlockEntity.Slot.SECONDARY
-        }
-        return CopycatFenceWallBlockEntity.Slot.PRIMARY
+
+        return CopycatFenceWallBlockEntity.FenceSlot.POST
     }
+
+    private fun connectionProperty(direction: Direction) =
+        when (direction) {
+            Direction.NORTH -> CopycatFenceBlock.NORTH
+            Direction.EAST -> CopycatFenceBlock.EAST
+            Direction.SOUTH -> CopycatFenceBlock.SOUTH
+            Direction.WEST -> CopycatFenceBlock.WEST
+            else -> CopycatFenceBlock.NORTH
+        }
+
+    private fun topSlot(direction: Direction): CopycatFenceWallBlockEntity.FenceSlot =
+        when (direction) {
+            Direction.NORTH -> CopycatFenceWallBlockEntity.FenceSlot.NORTH_TOP
+            Direction.EAST -> CopycatFenceWallBlockEntity.FenceSlot.EAST_TOP
+            Direction.SOUTH -> CopycatFenceWallBlockEntity.FenceSlot.SOUTH_TOP
+            Direction.WEST -> CopycatFenceWallBlockEntity.FenceSlot.WEST_TOP
+            else -> CopycatFenceWallBlockEntity.FenceSlot.POST
+        }
+
+    private fun bottomSlot(direction: Direction): CopycatFenceWallBlockEntity.FenceSlot =
+        when (direction) {
+            Direction.NORTH -> CopycatFenceWallBlockEntity.FenceSlot.NORTH_BOTTOM
+            Direction.EAST -> CopycatFenceWallBlockEntity.FenceSlot.EAST_BOTTOM
+            Direction.SOUTH -> CopycatFenceWallBlockEntity.FenceSlot.SOUTH_BOTTOM
+            Direction.WEST -> CopycatFenceWallBlockEntity.FenceSlot.WEST_BOTTOM
+            else -> CopycatFenceWallBlockEntity.FenceSlot.POST
+        }
 }

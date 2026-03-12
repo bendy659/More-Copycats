@@ -1,0 +1,62 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Author by _BENDY659_ (STUPID-AI)",
+	"textures": {
+		"0": "create:block/copycat_base",
+		"particle": "create:block/copycat_base"
+	},
+	"elements": [
+		{
+			"name": "Axis",
+			"from": [8, 0, 6],
+			"to": [10, 8, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [14, 0, 16, 8], "rotation": 180, "texture": "#0"},
+				"east": {"uv": [8, 0, 16, 2], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0, 0, 2, 2], "rotation": 180, "texture": "#0", "cullface": "south"}
+			}
+		},
+		{
+			"name": "Axis",
+			"from": [6, 0, 6],
+			"to": [8, 8, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 8], "rotation": 180, "texture": "#0"},
+				"west": {"uv": [0, 0, 8, 2], "rotation": 270, "texture": "#0"},
+				"down": {"uv": [14, 0, 16, 2], "rotation": 180, "texture": "#0", "cullface": "south"}
+			}
+		},
+		{
+			"name": "Axis",
+			"from": [6, 0, 8],
+			"to": [8, 8, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"south": {"uv": [16, 8, 14, 0], "texture": "#0"},
+				"west": {"uv": [0, 14, 8, 16], "rotation": 270, "texture": "#0"},
+				"down": {"uv": [14, 14, 16, 16], "rotation": 180, "texture": "#0", "cullface": "south"}
+			}
+		},
+		{
+			"name": "Axis",
+			"from": [8, 0, 8],
+			"to": [10, 8, 10],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"east": {"uv": [8, 14, 16, 16], "rotation": 90, "texture": "#0"},
+				"south": {"uv": [2, 8, 0, 0], "texture": "#0"},
+				"down": {"uv": [0, 14, 2, 16], "rotation": 180, "texture": "#0", "cullface": "south"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "axis",
+			"origin": [8, 8, 8],
+			"color": 0,
+			"children": [0, 1, 2, 3]
+		}
+	]
+}

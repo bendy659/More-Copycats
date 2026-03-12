@@ -16,6 +16,7 @@ import net.minecraft.core.BlockPos
 import net.minecraft.core.Direction
 import net.minecraft.world.level.BlockAndTintGetter
 import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.state.properties.BlockStateProperties
 import org.joml.Vector3fc
 
 object CopycatConnectedTextureHelper {
@@ -66,32 +67,31 @@ object CopycatConnectedTextureHelper {
         useConnected: Boolean = true
     ): BakedQuad {
         if (copycatState.isAir) return quad
+
         if (!useConnected) {
-            if (referenceQuad != null) {
-                return remapSprite(quad, referenceQuad.sprite())
+            if (referenceQuad != null && shouldUseReferenceOrientation(materialState)) {
+                return remapFromReference(quad, referenceQuad)
             }
-            return if (targetSprite == null) quad else remapSprite(quad, targetSprite)
+            val sprite = referenceQuad?.sprite() ?: targetSprite ?: return quad
+            return remapSprite(quad, sprite)
         }
 
-        if (referenceQuad != null) {
-            if (!materialHasCtModel(materialState)) {
-                return remapSprite(quad, referenceQuad.sprite())
-            }
-            if (!shouldUseConnected(world, pos, materialState, quad.direction())) {
-                return remapSprite(quad, referenceQuad.sprite())
-            }
+        val hasCt = materialHasCtModel(materialState)
+        if (hasCt && targetSprite != null && shouldUseConnected(world, pos, materialState, quad.direction())) {
+            return remapWorld(quad, targetSprite)
+        }
+
+        if (referenceQuad != null && shouldUseReferenceOrientation(materialState)) {
             return remapFromReference(quad, referenceQuad)
         }
 
-        if (!materialHasCtModel(materialState)) {
-            return if (targetSprite == null) quad else remapSprite(quad, targetSprite)
-        }
+        val sprite = referenceQuad?.sprite() ?: targetSprite ?: return quad
+        return remapSprite(quad, sprite)
+    }
 
-        if (targetSprite == null) return quad
-        if (!shouldUseConnected(world, pos, materialState, quad.direction())) {
-            return remapSprite(quad, targetSprite)
-        }
-        return remapWorld(quad, targetSprite)
+    private fun shouldUseReferenceOrientation(materialState: BlockState): Boolean {
+        return materialState.hasProperty(BlockStateProperties.AXIS) ||
+            materialState.hasProperty(BlockStateProperties.HORIZONTAL_AXIS)
     }
 
     private fun materialHasCtModel(materialState: BlockState): Boolean {
@@ -164,6 +164,7 @@ object CopycatConnectedTextureHelper {
         val refPacked = longArrayOf(reference.packedUV0(), reference.packedUV1(), reference.packedUV2(), reference.packedUV3())
         val refPos = arrayOf(reference.position0(), reference.position1(), reference.position2(), reference.position3())
         val refSt = Array(4) { i -> faceLocalUv(dir, refPos[i]) }
+        val templateSprite = template.sprite()
 
         fun nearest(targetS: Float, targetT: Float): Int {
             var best = 0
@@ -196,10 +197,14 @@ object CopycatConnectedTextureHelper {
             return a0 + (a1 - a0) * t
         }
 
-        fun map(v: Vector3fc): Long {
-            val st = faceLocalUv(dir, v)
-            val s = st.first.coerceIn(0f, 1f)
-            val t = st.second.coerceIn(0f, 1f)
+        val du = (templateSprite.u1 - templateSprite.u0).takeIf { kotlin.math.abs(it) > 1e-6f } ?: 1f
+        val dv = (templateSprite.v1 - templateSprite.v0).takeIf { kotlin.math.abs(it) > 1e-6f } ?: 1f
+
+        fun map(packedUv: Long): Long {
+            val rawU = UVPair.unpackU(packedUv)
+            val rawV = UVPair.unpackV(packedUv)
+            val s = ((rawU - templateSprite.u0) / du).coerceIn(0f, 1f)
+            val t = ((rawV - templateSprite.v0) / dv).coerceIn(0f, 1f)
             return UVPair.pack(
                 bilerp(u00, u10, u01, u11, s, t),
                 bilerp(v00, v10, v01, v11, s, t)
@@ -211,10 +216,10 @@ object CopycatConnectedTextureHelper {
             template.position1(),
             template.position2(),
             template.position3(),
-            map(template.position0()),
-            map(template.position1()),
-            map(template.position2()),
-            map(template.position3()),
+            map(template.packedUV0()),
+            map(template.packedUV1()),
+            map(template.packedUV2()),
+            map(template.packedUV3()),
             template.tintIndex(),
             template.direction(),
             reference.sprite(),

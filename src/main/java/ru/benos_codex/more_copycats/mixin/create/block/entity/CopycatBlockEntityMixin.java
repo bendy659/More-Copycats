@@ -2,11 +2,16 @@ package ru.benos_codex.more_copycats.mixin.create.block.entity;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.zurrtum.create.content.decoration.copycat.CopycatBlockEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.benos_codex.more_copycats.CopycatBlockEntityTypeHelper;
+import ru.benos_codex.more_copycats.block.entity.MaterialLightHelper;
 
 @Mixin(value = CopycatBlockEntity.class, remap = false)
 public class CopycatBlockEntityMixin {
@@ -29,5 +34,16 @@ public class CopycatBlockEntityMixin {
     private static BlockEntityType<?> more_copycats$redirectBlockEntityType(BlockEntityType<?> original) {
         BlockEntityType<?> override = CopycatBlockEntityTypeHelper.OVERRIDE.get();
         return override != null ? override : original;
+    }
+
+    @Inject(method = "setMaterial", at = @At("TAIL"), remap = false)
+    private void more_copycats$refreshLight(BlockState blockState, CallbackInfo ci) {
+        CopycatBlockEntity self = (CopycatBlockEntity) (Object) this;
+        Level level = self.getLevel();
+        if (level == null) {
+            return;
+        }
+
+        MaterialLightHelper.INSTANCE.refresh(level, self.getBlockPos(), self.getBlockState(), 16);
     }
 }

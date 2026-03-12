@@ -30,10 +30,26 @@ class CopycatSlabBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedR
         val axis = state.getValue(CopycatSlabBlock.AXIS)
 
         val slabEntity = world.getBlockEntity(pos) as? CopycatSlabBlockEntity
-        val bottomMaterial = slabEntity?.getHalfMaterial(SlabType.BOTTOM) ?: material
-        val topMaterial = slabEntity?.getHalfMaterial(SlabType.TOP) ?: material
-        val bottomRefs = collectMaterialReferences(world, pos, bottomMaterial, random)
-        val topRefs = collectMaterialReferences(world, pos, topMaterial, random)
+        val bottomHasCustom = slabEntity?.hasCustomMaterial(SlabType.BOTTOM) == true
+        val bottomFallback = slabEntity?.getHalfMaterial(SlabType.BOTTOM) ?: material
+        val bottomMaterial = MaterialSlotDebug.material(
+            0,
+            bottomHasCustom,
+            bottomFallback
+        )
+        val topHasCustom = slabEntity?.hasCustomMaterial(SlabType.TOP) == true
+        val topFallback = slabEntity?.getHalfMaterial(SlabType.TOP) ?: material
+        val topMaterial = MaterialSlotDebug.material(
+            1,
+            topHasCustom,
+            topFallback
+        )
+        val bottomRefs = MaterialSlotDebug.references(0, bottomHasCustom) {
+            collectMaterialReferences(world, pos, it, random)
+        } ?: collectMaterialReferences(world, pos, bottomMaterial, random)
+        val topRefs = MaterialSlotDebug.references(1, topHasCustom) {
+            collectMaterialReferences(world, pos, it, random)
+        } ?: collectMaterialReferences(world, pos, topMaterial, random)
 
         val templateParts = mutableListOf<BlockModelPart>()
         model.collectParts(random, templateParts)
@@ -45,7 +61,7 @@ class CopycatSlabBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedR
                 SlabType.TOP -> addPartRemapped(templatePart, builder, topRefs, block, state, topMaterial, world, pos)
                 SlabType.DOUBLE -> addPartRemappedSplit(templatePart, builder, bottomRefs, topRefs, bottomMaterial, topMaterial, axis, block, state, world, pos)
             }
-            parts += SimpleModelWrapper(builder.build(), templatePart.useAmbientOcclusion(), templatePart.particleIcon())
+            parts += SimpleModelWrapper(builder.build(), MaterialSlotDebug.ambientOcclusion(templatePart.useAmbientOcclusion()), templatePart.particleIcon())
         }
     }
 
@@ -92,7 +108,9 @@ class CopycatSlabBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedR
     ) {
         for (quad in templatePart.getQuads(null)) {
             val ref = refs[quad.direction()]
-            builder.addUnculledFace(CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material))
+            val remapped = CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material)
+            if (CopycatQuadCulling.isOnOuterBoundary(quad, quad.direction())) builder.addCulledFace(quad.direction(), remapped)
+            else builder.addUnculledFace(remapped)
         }
 
         for (direction in Direction.entries) {
@@ -129,7 +147,9 @@ class CopycatSlabBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedR
             val refs = pickRefs(quad)
             val ref = refs[quad.direction()]
             val material = pickMaterial(quad)
-            builder.addUnculledFace(CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material))
+            val remapped = CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material)
+            if (CopycatQuadCulling.isOnOuterBoundary(quad, quad.direction())) builder.addCulledFace(quad.direction(), remapped)
+            else builder.addUnculledFace(remapped)
         }
 
         for (direction in Direction.entries) {
@@ -144,7 +164,10 @@ class CopycatSlabBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedR
         }
     }
 
-    private fun pickHalf(quad: BakedQuad, axis: Direction.Axis): SlabType {
+    private fun pickHalf(
+        quad: BakedQuad,
+        axis: Direction.Axis
+    ): SlabType {
         val c0 = axisCoord(quad.position0(), axis)
         val c1 = axisCoord(quad.position1(), axis)
         val c2 = axisCoord(quad.position2(), axis)
@@ -167,5 +190,4 @@ class CopycatSlabBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedR
         Direction.Axis.Y -> v.y()
         Direction.Axis.Z -> v.z()
     }
-
 }

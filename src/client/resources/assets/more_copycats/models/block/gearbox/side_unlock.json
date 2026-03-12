@@ -1,0 +1,52 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Author by _BENDY659_ (STUPID-AI)",
+	"parent": "minecraft:block/block",
+	"textures": {
+		"0": "create:block/copycat_base",
+		"1": "create:block/gearbox",
+		"particle": "create:block/copycat_base"
+	},
+	"elements": [
+		{
+			"from": [5, 4, 1.975],
+			"to": [11, 12, 1.975],
+			"rotation": {"angle": 0, "axis": "y", "origin": [14, 0, -0.025]},
+			"faces": {
+				"north": {"uv": [5, 4, 11, 12], "texture": "#1"}
+			}
+		},
+		{
+			"from": [4, 5, 1.975],
+			"to": [5, 11, 1.975],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 0, -0.025]},
+			"faces": {
+				"north": {"uv": [11, 5, 12, 11], "texture": "#1"}
+			}
+		},
+		{
+			"from": [11, 5, 1.975],
+			"to": [12, 11, 1.975],
+			"rotation": {"angle": 0, "axis": "y", "origin": [15, 0, -0.025]},
+			"faces": {
+				"north": {"uv": [4, 5, 5, 11], "texture": "#1"}
+			}
+		},
+		{
+			"from": [2, 2, 2],
+			"to": [14, 14, 2],
+			"rotation": {"angle": 0, "axis": "y", "origin": [14, 0, 0]},
+			"faces": {
+				"north": {"uv": [2, 2, 14, 14], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "side_unlock",
+			"origin": [14, 0, -0.025],
+			"color": 0,
+			"children": [0, 1, 2, 3]
+		}
+	]
+}

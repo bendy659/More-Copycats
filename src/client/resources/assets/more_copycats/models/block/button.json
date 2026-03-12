@@ -1,6 +1,7 @@
 {
 	"format_version": "1.21.11",
 	"credit": "Author by _BENDY659_ (STUPID-AI)",
+	"parent": "minecraft:block/block",
 	"textures": {
 		"1": "create:block/copycat_base",
 		"particle": "create:block/copycat_base"
@@ -13,7 +14,7 @@
 				"east": {"uv": [0, 14, 2, 16], "texture": "#1"},
 				"south": {"uv": [13, 14, 16, 16], "texture": "#1"},
 				"up": {"uv": [4, 3, 1, 1], "texture": "#1"},
-				"down": {"uv": [13, 0, 16, 2], "texture": "#1", "cullface": "down"}
+				"down": {"uv": [13, 0, 16, 2], "texture": "#1"}
 			}
 		},
 		{
@@ -24,7 +25,7 @@
 				"south": {"uv": [0, 14, 3, 16], "texture": "#1"},
 				"west": {"uv": [14, 14, 16, 16], "texture": "#1"},
 				"up": {"uv": [15, 3, 12, 1], "texture": "#1"},
-				"down": {"uv": [0, 0, 3, 2], "texture": "#1", "cullface": "down"}
+				"down": {"uv": [0, 0, 3, 2], "texture": "#1"}
 			}
 		},
 		{
@@ -35,7 +36,7 @@
 				"north": {"uv": [0, 14, 3, 16], "texture": "#1"},
 				"east": {"uv": [14, 14, 16, 16], "texture": "#1"},
 				"up": {"uv": [4, 15, 1, 13], "texture": "#1"},
-				"down": {"uv": [13, 14, 16, 16], "texture": "#1", "cullface": "down"}
+				"down": {"uv": [13, 14, 16, 16], "texture": "#1"}
 			}
 		},
 		{
@@ -46,7 +47,7 @@
 				"north": {"uv": [13, 14, 16, 16], "texture": "#1"},
 				"west": {"uv": [0, 14, 2, 16], "texture": "#1"},
 				"up": {"uv": [15, 15, 12, 13], "texture": "#1"},
-				"down": {"uv": [0, 14, 3, 16], "texture": "#1", "cullface": "down"}
+				"down": {"uv": [0, 14, 3, 16], "texture": "#1"}
 			}
 		}
 	]

@@ -1,0 +1,124 @@
+{
+    "multipart": [
+        {
+            "when": { "axis": "x" },
+            "apply": { "model": "more_copycats:block/gearbox/base", "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y" },
+            "apply": { "model": "more_copycats:block/gearbox/base", "z": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z" },
+            "apply": { "model": "more_copycats:block/gearbox/base", "y": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "lock_north": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_north": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_east": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "y": 90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_east": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "y": 90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "x", "lock_south": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_south": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_west": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "y": -90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_west": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "y": -90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "lock_north": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_north": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_east": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "y": 90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_east": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "y": 90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "x", "lock_south": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_south": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "lock_west": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "y": -90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_west": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "y": -90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "lock_top": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "x": -90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_top": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "x": -90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "x", "lock_bottom": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "x": 90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_bottom": false },
+            "apply": { "model": "more_copycats:block/gearbox/side_unlock", "x": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "lock_top": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "x": -90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_top": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "x": -90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "x", "lock_bottom": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "x": 90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "lock_bottom": true },
+            "apply": { "model": "more_copycats:block/gearbox/side_lock", "x": 90, "uvlock": true }
+        }
+    ]
+}

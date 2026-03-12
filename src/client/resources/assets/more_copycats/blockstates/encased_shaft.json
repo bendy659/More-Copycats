@@ -1,0 +1,33 @@
+{
+    "multipart": [
+        {
+            "when": { "axis": "x" },
+            "apply": { "model": "more_copycats:block/encased/root_shaft", "x": 90, "y": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "x" },
+            "apply": { "model": "more_copycats:block/shaft/normal", "x": 90, "y": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y" },
+            "apply": { "model": "more_copycats:block/encased/root_shaft", "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y" },
+            "apply": { "model": "more_copycats:block/shaft/normal", "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z" },
+            "apply": { "model": "more_copycats:block/encased/root_shaft", "x": 90, "y": 180, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z" },
+            "apply": { "model": "more_copycats:block/shaft/normal", "x": 90, "y": 180, "uvlock": true }
+        }
+    ]
+}

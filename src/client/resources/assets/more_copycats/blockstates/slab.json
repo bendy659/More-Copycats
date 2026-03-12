@@ -2,53 +2,59 @@
     "multipart": [
         {
             "when": { "axis": "x", "type": "bottom" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 90, "y": 90 }
+            "apply": { "model": "more_copycats:block/slab", "x": 90, "y": 90, "uvlock": true }
         },
         {
             "when": { "axis": "x", "type": "top" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 90, "y": -90 }
+            "apply": { "model": "more_copycats:block/slab", "x": 90, "y": -90, "uvlock": true }
         },
         {
             "when": { "axis": "x", "type": "double" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 90, "y": 90 }
+            "apply": { "model": "more_copycats:block/slab", "x": 90, "y": 90, "uvlock": true }
         },
         {
             "when": { "axis": "x", "type": "double" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 90, "y": -90 }
+            "apply": { "model": "more_copycats:block/slab", "x": 90, "y": -90, "uvlock": true }
         },
-
+    
         {
             "when": { "axis": "y", "type": "bottom" },
-            "apply": { "model": "more_copycats:block/slab_part" }
+            "apply": { "model": "more_copycats:block/slab", "uvlock": true }
         },
+    
         {
             "when": { "axis": "y", "type": "top" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 180 }
+            "apply": { "model": "more_copycats:block/slab", "x": 180, "uvlock": true }
         },
+    
         {
             "when": { "axis": "y", "type": "double" },
-            "apply": { "model": "more_copycats:block/slab_part" }
+            "apply": { "model": "more_copycats:block/slab", "uvlock": true }
         },
+    
         {
             "when": { "axis": "y", "type": "double" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 180 }
+            "apply": { "model": "more_copycats:block/slab", "x": 180, "uvlock": true }
         },
-
+    
         {
             "when": { "axis": "z", "type": "bottom" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 90, "y": 180 }
+            "apply": { "model": "more_copycats:block/slab", "x": 90, "y": 180, "uvlock": true }
         },
+    
         {
             "when": { "axis": "z", "type": "top" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": -90, "y": -180 }
+            "apply": { "model": "more_copycats:block/slab", "x": -90, "y": -180, "uvlock": true }
         },
+    
         {
             "when": { "axis": "z", "type": "double" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": 90, "y": 180 }
+            "apply": { "model": "more_copycats:block/slab", "x": 90, "y": 180, "uvlock": true }
         },
+    
         {
             "when": { "axis": "z", "type": "double" },
-            "apply": { "model": "more_copycats:block/slab_part", "x": -90, "y": -180 }
+            "apply": { "model": "more_copycats:block/slab", "x": -90, "y": -180, "uvlock": true }
         }
     ]
 }

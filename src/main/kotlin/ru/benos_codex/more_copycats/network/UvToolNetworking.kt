@@ -77,7 +77,7 @@ object UvToolNetworking {
 
                 val material: BlockState? = if (payload.hasMaterial && payload.materialId != null) {
                     val block = BuiltInRegistries.BLOCK.getValue(payload.materialId)
-                    block?.defaultBlockState()
+                    block.defaultBlockState()
                 } else {
                     null
                 }

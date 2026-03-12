@@ -103,7 +103,7 @@ class CopycatByteSimpleBlockModel(state: BlockState, unbaked: BlockStateModel.Un
             for (face in Direction.entries) {
                 if (hasNeighbor(be, i, face)) continue
                 val state = be.getFaceState(i, face) ?: continue
-                val material = if (state == DEFAULT_MATERIAL) base else state
+                val material = MaterialSlotDebug.materialForFace(i, state != DEFAULT_MATERIAL, face, if (state == DEFAULT_MATERIAL) base else state)
                 renderFace(material, be, i, p0, p1, p5, p6, box, face)
             }
         }

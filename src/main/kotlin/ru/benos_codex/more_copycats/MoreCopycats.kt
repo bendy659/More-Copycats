@@ -15,6 +15,9 @@ object MoreCopycats : ModInitializer {
     val String.rl: Identifier get() = Identifier.parse(this)
     val String.mrl: Identifier get() = "more_copycats:$this".rl
 
+    const val DEBUG_COGWHEEL_RENDER_LOGS: Boolean = false
+    const val DEBUG_COGWHEEL_HIT_LOGS: Boolean = false
+
     val DEFAULT_MATERIAL: BlockState = Blocks.AIR.defaultBlockState()
     val DEFAULT_PROPERTIES: BlockBehaviour.Properties = BlockBehaviour.Properties
         .of()
@@ -24,6 +27,10 @@ object MoreCopycats : ModInitializer {
 
     object Config {
         var uvGridStep: Int = 1
+        var showCogwheelFreeSlotOverlay: Boolean = true
+        var showPartOverlay: Boolean = true
+        var debugCogwheelSlotColors: Boolean = false
+        var debugCogwheelSafeZoneOverlay: Boolean = false
 
         fun load() {
             val configDir = FabricLoader.getInstance().configDir
@@ -33,7 +40,22 @@ object MoreCopycats : ModInitializer {
                 file.inputStream().use { props.load(it) }
             }
             uvGridStep = props.getProperty("uv_grid_step", "1").toIntOrNull()?.coerceAtLeast(1) ?: 1
+            showCogwheelFreeSlotOverlay = props.getProperty("cogwheel_free_slot_overlay", "true").toBoolean()
+            showPartOverlay = props.getProperty(
+                "part_overlay",
+                props.getProperty("fence_part_overlay", props.getProperty("wall_part_overlay", "true"))
+            ).toBoolean()
+            debugCogwheelSlotColors = props.getProperty("debug_cogwheel_slot_colors", "false").toBoolean()
+            debugCogwheelSafeZoneOverlay = props.getProperty("debug_cogwheel_safe_zone_overlay", "false").toBoolean()
             props.setProperty("uv_grid_step", uvGridStep.toString())
+            props.setProperty("cogwheel_free_slot_overlay", showCogwheelFreeSlotOverlay.toString())
+            props.setProperty("part_overlay", showPartOverlay.toString())
+            props.setProperty("debug_cogwheel_slot_colors", debugCogwheelSlotColors.toString())
+            props.setProperty("debug_cogwheel_safe_zone_overlay", debugCogwheelSafeZoneOverlay.toString())
+            props.remove("fence_part_overlay")
+            props.remove("wall_part_overlay")
+            props.remove("debug_cogwheel_render_logs")
+            props.remove("debug_cogwheel_hit_logs")
             file.outputStream().use { props.store(it, "More Copycats config") }
         }
     }

@@ -78,6 +78,14 @@ tasks.withType<KotlinCompile>().configureEach {
     compilerOptions.jvmTarget.set(JvmTarget.fromTarget(targetJavaVersion.toString()))
 }
 
+tasks.named<KotlinCompile>("compileKotlin") {
+    compilerOptions.moduleName.set("${project.name}.main")
+}
+
+tasks.named<KotlinCompile>("compileClientKotlin") {
+    compilerOptions.moduleName.set("${project.name}.client")
+}
+
 tasks.jar {
     from("LICENSE") {
         rename { "${it}_${project.base.archivesName.get()}" }

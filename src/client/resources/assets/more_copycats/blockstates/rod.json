@@ -1,24 +1,32 @@
 {
     "variants": {
-        "facing=up,part=end"   : { "model": "more_copycats:block/rod/end" },
-        "facing=east,part=end" : { "model": "more_copycats:block/rod/end", "x": 90,  "y": 90 },
-        "facing=north,part=end": { "model": "more_copycats:block/rod/end", "x": 90 },
-        "facing=south,part=end": { "model": "more_copycats:block/rod/end", "x": 90,  "y": 180 },
-        "facing=west,part=end" : { "model": "more_copycats:block/rod/end", "x": 90,  "y": 270 },
-        "facing=down,part=end" : { "model": "more_copycats:block/rod/end", "x": 180 },
-
-        "facing=up,part=middle_with"   :  { "model": "more_copycats:block/rod/middle_with" },
-        "facing=east,part=middle_with" :  { "model": "more_copycats:block/rod/middle_with", "x": 90,  "y": 90 },
-        "facing=north,part=middle_with":  { "model": "more_copycats:block/rod/middle_with", "x": 90 },
-        "facing=south,part=middle_with":  { "model": "more_copycats:block/rod/middle_with", "x": 90,  "y": 180 },
-        "facing=west,part=middle_with" :  { "model": "more_copycats:block/rod/middle_with", "x": 90,  "y": 270 },
-        "facing=down,part=middle_with" :  { "model": "more_copycats:block/rod/middle_with", "x": 180 },
-
-        "facing=up,part=middle_without"   : { "model": "more_copycats:block/rod/middle_without" },
-        "facing=east,part=middle_without" : { "model": "more_copycats:block/rod/middle_without", "x": 90,  "y": 90 },
-        "facing=north,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "x": 90 },
-        "facing=south,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "x": 90,  "y": 180 },
-        "facing=west,part=middle_without" : { "model": "more_copycats:block/rod/middle_without", "x": 90,  "y": 270 },
-        "facing=down,part=middle_without" : { "model": "more_copycats:block/rod/middle_without", "x": 180 }
+        "facing=up,part=end": { "model": "more_copycats:block/rod/end", "uvlock": true },
+    
+        "facing=east,part=end": { "model": "more_copycats:block/rod/end", "x": 90, "y": 90, "uvlock": true },
+        "facing=north,part=end": { "model": "more_copycats:block/rod/end", "x": 90, "uvlock": true },
+        "facing=south,part=end": { "model": "more_copycats:block/rod/end", "x": 90, "y": 180, "uvlock": true },
+        "facing=west,part=end": { "model": "more_copycats:block/rod/end", "x": 90, "y": 270, "uvlock": true },
+    
+        "facing=down,part=end": { "model": "more_copycats:block/rod/end", "x": 180, "uvlock": true },
+    
+    
+        "facing=up,part=middle_with": { "model": "more_copycats:block/rod/middle_with", "uvlock": true },
+    
+        "facing=east,part=middle_with": { "model": "more_copycats:block/rod/middle_with", "x": 90, "y": 90, "uvlock": true },
+        "facing=north,part=middle_with": { "model": "more_copycats:block/rod/middle_with", "x": 90, "uvlock": true },
+        "facing=south,part=middle_with": { "model": "more_copycats:block/rod/middle_with", "x": 90, "y": 180, "uvlock": true },
+        "facing=west,part=middle_with": { "model": "more_copycats:block/rod/middle_with", "x": 90, "y": 270, "uvlock": true },
+    
+        "facing=down,part=middle_with": { "model": "more_copycats:block/rod/middle_with", "x": 180, "uvlock": true },
+    
+    
+        "facing=up,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "uvlock": true },
+    
+        "facing=east,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "x": 90, "y": 90, "uvlock": true },
+        "facing=north,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "x": 90, "uvlock": true },
+        "facing=south,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "x": 90, "y": 180, "uvlock": true },
+        "facing=west,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "x": 90, "y": 270, "uvlock": true },
+    
+        "facing=down,part=middle_without": { "model": "more_copycats:block/rod/middle_without", "x": 180, "uvlock": true }
     }
 }

@@ -215,7 +215,7 @@ class CopycatSlabBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         }
     }
 
-    public override fun useItemOn(
+    override fun useItemOn(
         stack: ItemStack,
         state: BlockState,
         level: Level,
@@ -239,7 +239,7 @@ class CopycatSlabBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         val half = targetHalf(state, localX, localY, localZ, hitResult.direction)
 
         val current = blockEntity.getHalfMaterial(half)
-        if (current.`is`(material.block)) {
+        if (current.`is`(material.block) || blockEntity.hasCustomMaterial(half)) {
             if (!blockEntity.cycleHalfMaterial(half)) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND
             }
@@ -265,6 +265,16 @@ class CopycatSlabBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         }
         return InteractionResult.SUCCESS
     }
+
+    override fun prepareMaterial(
+        pLevel: Level,
+        pPos: BlockPos,
+        pState: BlockState,
+        pPlayer: Player,
+        pHand: InteractionHand,
+        pHit: BlockHitResult,
+        material: BlockState
+    ): BlockState? = material
 
     override fun onWrenched(state: BlockState, context: UseOnContext): InteractionResult {
         if (!CopycatDatapackManager.isBlockEnabled(state)) return InteractionResult.PASS

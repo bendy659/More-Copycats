@@ -1,0 +1,123 @@
+{
+    "multipart": [
+        {
+            "when": { "axis": "x" },
+            "apply": { "model": "more_copycats:block/encased/root_cogwheel", "z": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y" },
+            "apply": { "model": "more_copycats:block/encased/root_cogwheel", "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z" },
+            "apply": { "model": "more_copycats:block/encased/root_cogwheel", "x": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "top_shaft": true },
+            "apply": { "model": "more_copycats:block/shaft/axis", "z": -90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "x", "bottom_shaft": true },
+            "apply": { "model": "more_copycats:block/shaft/axis", "z": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "top_shaft": false },
+            "apply": { "model": "more_copycats:block/encased/side_close", "z": -90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "top_shaft": true },
+            "apply": { "model": "more_copycats:block/encased/side_open", "z": -90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "bottom_shaft": false },
+            "apply": { "model": "more_copycats:block/encased/side_close", "z": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x", "bottom_shaft": true },
+            "apply": { "model": "more_copycats:block/encased/side_open", "z": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "y", "top_shaft": true },
+            "apply": { "model": "more_copycats:block/shaft/axis", "x": 180, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y", "bottom_shaft": true },
+            "apply": { "model": "more_copycats:block/shaft/axis", "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "y", "top_shaft": false },
+            "apply": { "model": "more_copycats:block/encased/side_close", "x": 180, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "y", "top_shaft": true },
+            "apply": { "model": "more_copycats:block/encased/side_open", "x": 180, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "y", "bottom_shaft": false },
+            "apply": { "model": "more_copycats:block/encased/side_close", "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "y", "bottom_shaft": true },
+            "apply": { "model": "more_copycats:block/encased/side_open", "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "z", "top_shaft": true },
+            "apply": { "model": "more_copycats:block/shaft/axis", "x": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z", "bottom_shaft": true },
+            "apply": { "model": "more_copycats:block/shaft/axis", "x": -90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "z", "top_shaft": false },
+            "apply": { "model": "more_copycats:block/encased/side_close", "x": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "z", "top_shaft": true },
+            "apply": { "model": "more_copycats:block/encased/side_open", "x": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "z", "bottom_shaft": false },
+            "apply": { "model": "more_copycats:block/encased/side_close", "x": -90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "z", "bottom_shaft": true },
+            "apply": { "model": "more_copycats:block/encased/side_open", "x": -90, "uvlock": true }
+        }
+    ]
+}

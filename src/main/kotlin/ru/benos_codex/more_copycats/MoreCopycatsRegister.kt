@@ -1,6 +1,7 @@
 package ru.benos_codex.more_copycats
 
 import com.zurrtum.create.content.decoration.copycat.CopycatBlockEntity
+import com.zurrtum.create.content.decoration.encasing.EncasingRegistry
 import net.fabricmc.fabric.api.`object`.builder.v1.block.entity.FabricBlockEntityTypeBuilder
 import net.minecraft.core.BlockPos
 import net.minecraft.core.Registry
@@ -29,24 +30,36 @@ import ru.benos_codex.more_copycats.block.CopycatButtonBlock
 import ru.benos_codex.more_copycats.block.CopycatPressurePlateBlock
 import ru.benos_codex.more_copycats.block.CopycatDoorBlock
 import ru.benos_codex.more_copycats.block.CopycatFenceBlock
+import ru.benos_codex.more_copycats.block.CopycatCogwheelBlock
+import ru.benos_codex.more_copycats.block.CopycatEncasedCogwheelBlock
+import ru.benos_codex.more_copycats.block.CopycatEncasedShaftBlock
+import ru.benos_codex.more_copycats.block.CopycatGearboxBlock
+import ru.benos_codex.more_copycats.block.CopycatShaftBlock
+import ru.benos_codex.more_copycats.block.CopycatStepBlock
 import ru.benos_codex.more_copycats.block.CopycatSlidingDoorBlock
 import ru.benos_codex.more_copycats.block.CopycatTrapdoorBlock
-import ru.benos_codex.more_copycats.block.CopycatVerticalStepBlock
 import ru.benos_codex.more_copycats.block.CopycatWallBlock
 import ru.benos_codex.more_copycats.block.entity.CopycatBiteBlockEntity
 import ru.benos_codex.more_copycats.block.entity.CopycatByteBlockEntity
+import ru.benos_codex.more_copycats.block.entity.CopycatCogwheelBlockEntity
 import ru.benos_codex.more_copycats.block.entity.CopycatFenceWallBlockEntity
+import ru.benos_codex.more_copycats.block.entity.CopycatGearboxBlockEntity
 import ru.benos_codex.more_copycats.block.entity.CopycatRedstoneBlockEntity
+import ru.benos_codex.more_copycats.block.entity.CopycatShaftBlockEntity
 import ru.benos_codex.more_copycats.block.entity.CopycatSlabBlockEntity
 import ru.benos_codex.more_copycats.block.entity.CopycatSlidingDoorBlockEntity
+import ru.benos_codex.more_copycats.block.entity.CopycatVerticalStepBlockEntity
 import ru.benos_codex.more_copycats.item.block.CopycatBiteBlockItem
 import ru.benos_codex.more_copycats.item.block.CopycatByteBlockItem
 import ru.benos_codex.more_copycats.item.block.CopycatSlabPlacementItem
+import ru.benos_codex.more_copycats.item.block.CopycatStepPlacementItem
+import ru.benos_codex.more_copycats.item.block.CopycatVerticalGearboxItem
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import ru.benos_codex.more_copycats.item.CopycatUvToolItem
 import ru.benos_codex.more_copycats.menu.CopycatUvToolMenu
 import ru.benos_codex.more_copycats.menu.UvToolOpenData
+import com.zurrtum.create.content.kinetics.simpleRelays.CogwheelBlockItem
 
 @Suppress("unused")
 object MoreCopycatsRegister {
@@ -105,8 +118,17 @@ object MoreCopycatsRegister {
     val STAIRS_BLOCK: CopycatStairsBlock = registerBlock("stairs", ::CopycatStairsBlock)
     val STAIRS_ITEM: BlockItem = registerBlockItem("stairs") { props -> BlockItem(STAIRS_BLOCK, props) }
 
-    val VERTICAL_STEP_BLOCK: CopycatVerticalStepBlock = registerBlock("vertical_step", ::CopycatVerticalStepBlock)
-    val VERTICAL_STEP_ITEM: BlockItem = registerBlockItem("vertical_step") { props -> BlockItem(VERTICAL_STEP_BLOCK, props) }
+    val STEP_BLOCK: CopycatStepBlock = registerBlock("step", ::CopycatStepBlock)
+    val STEP_ITEM: BlockItem = registerBlockItem("step") { props ->
+        CopycatStepPlacementItem(STEP_BLOCK, props, CopycatStepPlacementItem.Mode.HORIZONTAL)
+    }
+    val VERTICAL_STEP_ITEM: BlockItem = registerBlockItem("vertical_step") { props ->
+        CopycatStepPlacementItem(STEP_BLOCK, props, CopycatStepPlacementItem.Mode.VERTICAL)
+    }
+    val STEP_BE: BlockEntityType<CopycatVerticalStepBlockEntity> = registerBlockEntity("step", STEP_BLOCK) { pos, state ->
+        CopycatBlockEntityTypeHelper.OVERRIDE.set(STEP_BE)
+        try { CopycatVerticalStepBlockEntity(pos, state) } finally { CopycatBlockEntityTypeHelper.OVERRIDE.remove() }
+    }
 
     val BUTTON_BLOCK: CopycatButtonBlock = registerBlock("button", ::CopycatButtonBlock)
     val BUTTON_ITEM: BlockItem = registerBlockItem("button") { props -> BlockItem(BUTTON_BLOCK, props) }
@@ -155,10 +177,60 @@ object MoreCopycatsRegister {
         try { CopycatFenceWallBlockEntity(pos, state) } finally { CopycatBlockEntityTypeHelper.OVERRIDE.remove() }
     }
 
+    val COGWHEEL_BLOCK: CopycatCogwheelBlock = registerBlock("cogwheel", ::CopycatCogwheelBlock)
+    val COGWHEEL_ITEM: BlockItem = registerBlockItem("cogwheel") { props -> CogwheelBlockItem(COGWHEEL_BLOCK, props) }
+    val LARGE_COGWHEEL_BLOCK: CopycatCogwheelBlock = registerBlock("large_cogwheel") { props ->
+        CopycatCogwheelBlock(props, true)
+    }
+    val LARGE_COGWHEEL_ITEM: BlockItem = registerBlockItem("large_cogwheel") { props ->
+        CogwheelBlockItem(LARGE_COGWHEEL_BLOCK, props)
+    }
+    val ENCASED_COGWHEEL_BLOCK: CopycatEncasedCogwheelBlock =
+        registerBlock("encased_cogwheel", ::CopycatEncasedCogwheelBlock)
+    val ENCASED_COGWHEEL_ITEM: BlockItem = registerBlockItem("encased_cogwheel") { props ->
+        CogwheelBlockItem(ENCASED_COGWHEEL_BLOCK, props)
+    }
+    val ENCASED_LARGE_COGWHEEL_BLOCK: CopycatEncasedCogwheelBlock =
+        registerBlock("encased_large_cogwheel") { props -> CopycatEncasedCogwheelBlock(props, true) }
+    val ENCASED_LARGE_COGWHEEL_ITEM: BlockItem = registerBlockItem("encased_large_cogwheel") { props ->
+        CogwheelBlockItem(ENCASED_LARGE_COGWHEEL_BLOCK, props)
+    }
+    val COGWHEEL_BE: BlockEntityType<CopycatCogwheelBlockEntity> =
+        registerBlockEntity(
+            "cogwheel",
+            COGWHEEL_BLOCK,
+            LARGE_COGWHEEL_BLOCK,
+            ENCASED_COGWHEEL_BLOCK,
+            ENCASED_LARGE_COGWHEEL_BLOCK
+        ) { pos, state ->
+            CopycatCogwheelBlockEntity(COGWHEEL_BE, pos, state)
+        }
+
+    val SHAFT_BLOCK: CopycatShaftBlock = registerBlock("shaft", ::CopycatShaftBlock)
+    val GEARBOX_SHAFT_BLOCK: CopycatShaftBlock = registerBlock("gearbox_shaft", ::CopycatShaftBlock)
+    val SHAFT_ITEM: BlockItem = registerBlockItem("shaft") { props -> BlockItem(SHAFT_BLOCK, props) }
+    val ENCASED_SHAFT_BLOCK: CopycatEncasedShaftBlock = registerBlock("encased_shaft", ::CopycatEncasedShaftBlock)
+    val ENCASED_SHAFT_ITEM: BlockItem = registerBlockItem("encased_shaft") { props -> BlockItem(ENCASED_SHAFT_BLOCK, props) }
+    val SHAFT_BE: BlockEntityType<CopycatShaftBlockEntity> =
+        registerBlockEntity("shaft", SHAFT_BLOCK, ENCASED_SHAFT_BLOCK, GEARBOX_SHAFT_BLOCK) { pos, state ->
+            CopycatShaftBlockEntity(SHAFT_BE, pos, state)
+        }
+
+    val GEARBOX_BLOCK: CopycatGearboxBlock = registerBlock("gearbox", ::CopycatGearboxBlock)
+    val GEARBOX_ITEM: BlockItem = registerBlockItem("gearbox") { props ->
+        BlockItem(GEARBOX_BLOCK, props)
+    }
+    val VERTICAL_GEARBOX_ITEM: BlockItem = registerBlockItem("vertical_gearbox") { props ->
+        CopycatVerticalGearboxItem(GEARBOX_BLOCK, props)
+    }
+    val GEARBOX_BE: BlockEntityType<CopycatGearboxBlockEntity> =
+        registerBlockEntity("gearbox", GEARBOX_BLOCK) { pos, state ->
+            CopycatGearboxBlockEntity(GEARBOX_BE, pos, state)
+        }
+
     val SIMPLE_BE: BlockEntityType<CopycatBlockEntity> = registerBlockEntity(
         "simple",
         STAIRS_BLOCK,
-        VERTICAL_STEP_BLOCK,
         DOOR_BLOCK,
         TRAPDOOR_BLOCK
     ) { pos, state ->
@@ -172,6 +244,14 @@ object MoreCopycatsRegister {
         get() {
             // Access a registered entry to keep explicit init call meaningful.
             BYTE_BLOCK
+            EncasingRegistry.addVariant<CopycatCogwheelBlock, CopycatEncasedCogwheelBlock, Any>(
+                COGWHEEL_BLOCK,
+                ENCASED_COGWHEEL_BLOCK
+            )
+            EncasingRegistry.addVariant<CopycatCogwheelBlock, CopycatEncasedCogwheelBlock, Any>(
+                LARGE_COGWHEEL_BLOCK,
+                ENCASED_LARGE_COGWHEEL_BLOCK
+            )
         }
 
     private fun <B: Block> registerBlock(id: String, block: (BlockBehaviour.Properties) -> B): B {
@@ -215,6 +295,7 @@ object MoreCopycatsRegister {
             .icon { ItemStack(STAIRS_ITEM) }
             .displayItems { _, entries ->
                 entries.accept(STAIRS_ITEM)
+                entries.accept(STEP_ITEM)
                 entries.accept(VERTICAL_STEP_ITEM)
                 entries.accept(BUTTON_ITEM)
                 entries.accept(PRESSURE_PLATE_ITEM)
@@ -225,6 +306,14 @@ object MoreCopycatsRegister {
                 entries.accept(TRAPDOOR_ITEM)
                 entries.accept(FENCE_ITEM)
                 entries.accept(WALL_ITEM)
+                entries.accept(SHAFT_ITEM)
+                entries.accept(ENCASED_SHAFT_ITEM)
+                entries.accept(GEARBOX_ITEM)
+                entries.accept(VERTICAL_GEARBOX_ITEM)
+                entries.accept(COGWHEEL_ITEM)
+                entries.accept(LARGE_COGWHEEL_ITEM)
+                entries.accept(ENCASED_COGWHEEL_ITEM)
+                entries.accept(ENCASED_LARGE_COGWHEEL_ITEM)
             }
             .build()
 

@@ -18,8 +18,8 @@ import net.minecraft.world.item.BlockItem
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.item.context.UseOnContext
-import net.minecraft.world.level.Level
 import net.minecraft.world.level.BlockAndTintGetter
+import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.DoorBlock
 import net.minecraft.world.level.block.EntityBlock
@@ -89,7 +89,7 @@ class CopycatSlidingDoorBlock(props: Properties) :
             return InteractionResult.SUCCESS
         }
 
-        if (be.getMaterialState(targetHalf).`is`(material.block)) {
+        if (be.getMaterialState(targetHalf).`is`(material.block) || be.hasCustomMaterial(targetHalf)) {
             if (!be.cycleMaterial(targetHalf)) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND
             }

@@ -86,7 +86,7 @@ class CopycatBiteBlockModel(state: BlockState, unbaked: BlockStateModel.UnbakedR
 
                 for (face in Direction.entries) {
                     val state = blockEntity.getFaceState(i, face) ?: continue
-                    val material = if (state == DEFAULT_MATERIAL) base else state
+                    val material = MaterialSlotDebug.materialForFace(i, state != DEFAULT_MATERIAL, face, if (state == DEFAULT_MATERIAL) base else state)
                     val u = blockEntity.getUvUFloat(i, face, time)
                     val v = blockEntity.getUvVFloat(i, face, time)
                     val w = blockEntity.getUvW(i, face)

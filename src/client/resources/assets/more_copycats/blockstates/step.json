@@ -1,0 +1,56 @@
+{
+    "multipart": [
+        {
+            "when": { "axis": "x", "p0": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": -90, "y": -90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "x", "p1": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": -90, "y": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "x", "p2": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": 90, "y": -90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "x", "p3": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": 90, "y": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y", "p0": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "p1": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "y": -90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "p2": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "y": 90, "uvlock": true }
+        },
+        {
+            "when": { "axis": "y", "p3": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z", "p0": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": -90, "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "p1": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": -90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z", "p2": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": 90, "y": 180, "uvlock": true }
+        },
+        {
+            "when": { "axis": "z", "p3": true },
+            "apply": { "model": "more_copycats:block/vertical_step", "x": 90, "uvlock": true }
+        }
+    ]
+}

@@ -4,8 +4,11 @@
     "package": "ru.benos_codex.more_copycats.mixin",
     "compatibilityLevel": "JAVA_21",
     "mixins": [
+        "create.item.CopycatStepBlockItemMixin",
         "create.block.entity.CopycatBlockEntityMixin",
-        "create.block.entity.SlidingDoorBlockEntityMixin"
+        "create.block.entity.CopycatBlockEntityAccessor",
+        "create.block.entity.SlidingDoorBlockEntityMixin",
+        "create.kinetics.RotationPropagatorMixin"
     ],
     "injectors": {
         "defaultRequire": 1

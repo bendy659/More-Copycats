@@ -12,9 +12,11 @@ import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.context.BlockPlaceContext
 import net.minecraft.world.item.context.UseOnContext
 import net.minecraft.world.level.BlockAndTintGetter
+import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.BlockHitResult
+import ru.benos_codex.more_copycats.block.entity.MaterialLightHelper
 import ru.benos_codex.more_copycats.MoreCopycatsRegister
 import ru.benos_codex.more_copycats.datapack.CopycatDatapackManager
 
@@ -59,6 +61,29 @@ open class CopycatSimpleBlock(props: Properties) : CopycatBlock(props) {
             return InteractionResult.PASS
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hitResult)
+    }
+
+    override fun getLuminance(world: BlockGetter, pos: BlockPos): Int {
+        val state = world.getBlockState(pos)
+        if (!state.`is`(this)) return super.getLuminance(world, pos)
+
+        val be = world.getBlockEntity(pos) as? CopycatBlockEntity ?: return super.getLuminance(world, pos)
+        if (!be.hasCustomMaterial()) return super.getLuminance(world, pos)
+
+        return MaterialLightHelper.resolvedEmission(world, pos, state, be.material)
+    }
+
+    override fun prepareMaterial(
+        pLevel: net.minecraft.world.level.Level,
+        pPos: BlockPos,
+        pState: BlockState,
+        pPlayer: Player,
+        pHand: InteractionHand,
+        pHit: BlockHitResult,
+        material: BlockState
+    ): BlockState? {
+        val be = pLevel.getBlockEntity(pPos) as? CopycatBlockEntity ?: return material
+        return if (be.hasCustomMaterial()) be.material else material
     }
 
     override fun onWrenched(state: BlockState, context: UseOnContext): InteractionResult {

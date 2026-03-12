@@ -41,6 +41,7 @@ import net.minecraft.world.level.block.state.properties.WallSide
 import net.minecraft.world.level.material.FluidState
 import net.minecraft.world.level.material.Fluids
 import net.minecraft.world.level.pathfinder.PathComputationType
+import net.minecraft.world.phys.AABB
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.shapes.BooleanOp
 import net.minecraft.world.phys.shapes.CollisionContext
@@ -65,11 +66,65 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         private val SIDE_COLLISION_SHAPES: Map<Direction, VoxelShape> = Shapes.rotateHorizontal(box(5.0, 0.0, 0.0, 11.0, 24.0, 8.0))
         private val TEST_SHAPE_POST: VoxelShape = column(2.0, 0.0, 16.0)
         private val TEST_SHAPES_WALL: Map<Direction, VoxelShape> = Shapes.rotateHorizontal(boxZ(2.0, 16.0, 0.0, 9.0))
+        private val CENTER_BOX = LocalBox(4.0 / 16.0, 0.0, 4.0 / 16.0, 12.0 / 16.0, 1.0, 12.0 / 16.0)
+        private val LOW_SIDE_BOXES = mapOf(
+            Direction.NORTH to LocalBox(5.0 / 16.0, 0.0, 0.0, 11.0 / 16.0, 14.0 / 16.0, 8.0 / 16.0),
+            Direction.EAST to LocalBox(8.0 / 16.0, 0.0, 5.0 / 16.0, 1.0, 14.0 / 16.0, 11.0 / 16.0),
+            Direction.SOUTH to LocalBox(5.0 / 16.0, 0.0, 8.0 / 16.0, 11.0 / 16.0, 14.0 / 16.0, 1.0),
+            Direction.WEST to LocalBox(0.0, 0.0, 5.0 / 16.0, 8.0 / 16.0, 14.0 / 16.0, 11.0 / 16.0)
+        )
+        private val TALL_SIDE_BOXES = mapOf(
+            Direction.NORTH to LocalBox(5.0 / 16.0, 0.0, 0.0, 11.0 / 16.0, 1.0, 8.0 / 16.0),
+            Direction.EAST to LocalBox(8.0 / 16.0, 0.0, 5.0 / 16.0, 1.0, 1.0, 11.0 / 16.0),
+            Direction.SOUTH to LocalBox(5.0 / 16.0, 0.0, 8.0 / 16.0, 11.0 / 16.0, 1.0, 1.0),
+            Direction.WEST to LocalBox(0.0, 0.0, 5.0 / 16.0, 8.0 / 16.0, 1.0, 11.0 / 16.0)
+        )
     }
 
-    private enum class Part(val slot: CopycatFenceWallBlockEntity.Slot) {
-        CENTER(CopycatFenceWallBlockEntity.Slot.PRIMARY),
-        SIDE(CopycatFenceWallBlockEntity.Slot.SECONDARY)
+    data class SlotBox(
+        val slot: CopycatFenceWallBlockEntity.WallSlot,
+        val aabb: AABB
+    )
+
+    private data class LocalBox(
+        val minX: Double,
+        val minY: Double,
+        val minZ: Double,
+        val maxX: Double,
+        val maxY: Double,
+        val maxZ: Double
+    ) {
+        fun contains(x: Double, y: Double, z: Double): Boolean =
+            x in minX..maxX && y in minY..maxY && z in minZ..maxZ
+
+        fun distanceSquaredTo(x: Double, y: Double, z: Double): Double {
+            val dx = when {
+                x < minX -> minX - x
+                x > maxX -> x - maxX
+                else -> 0.0
+            }
+            val dy = when {
+                y < minY -> minY - y
+                y > maxY -> y - maxY
+                else -> 0.0
+            }
+            val dz = when {
+                z < minZ -> minZ - z
+                z > maxZ -> z - maxZ
+                else -> 0.0
+            }
+            return dx * dx + dy * dy + dz * dz
+        }
+
+        fun toWorldAabb(pos: BlockPos): AABB =
+            AABB(
+                pos.x + minX,
+                pos.y + minY,
+                pos.z + minZ,
+                pos.x + maxX,
+                pos.y + maxY,
+                pos.z + maxZ
+            )
     }
 
     init {
@@ -134,6 +189,9 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         // Allow top-support placement on wall arms; post visibility still follows vanilla wall rules.
         return Shapes.or(base, POST_SHAPE)
     }
+
+    override fun getLuminance(world: BlockGetter, pos: BlockPos): Int =
+        (world.getBlockEntity(pos) as? CopycatFenceWallBlockEntity)?.getMaxLightEmission() ?: super.getLuminance(world, pos)
 
     override fun getStateForPlacement(ctx: BlockPlaceContext): BlockState? {
         val level = ctx.level
@@ -204,10 +262,10 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
             ?: return super.useItemOn(stack, state, level, pos, player, hand, hitResult)
         val material = prepareMaterial(level, pos, state, player, hand, hitResult, materialIn)
             ?: return InteractionResult.TRY_WITH_EMPTY_HAND
-        val slot = partAt(state, hitResult, pos).slot
+        val slot = slotFromHit(state, hitResult)
 
         val current = blockEntity.getSlotMaterial(slot)
-        if (current.`is`(material.block)) {
+        if (current.`is`(material.block) || blockEntity.hasCustomMaterial(slot)) {
             if (!blockEntity.cycleSlotMaterial(slot)) {
                 return InteractionResult.TRY_WITH_EMPTY_HAND
             }
@@ -234,13 +292,23 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         return InteractionResult.SUCCESS
     }
 
+    override fun prepareMaterial(
+        pLevel: Level,
+        pPos: BlockPos,
+        pState: BlockState,
+        pPlayer: Player,
+        pHand: InteractionHand,
+        pHit: BlockHitResult,
+        material: BlockState
+    ): BlockState? = material
+
     override fun onWrenched(state: BlockState, context: UseOnContext): InteractionResult {
         if (!CopycatDatapackManager.isBlockEnabled(state)) return InteractionResult.PASS
         val level = context.level
         val pos = context.clickedPos
         val player = context.player ?: return InteractionResult.PASS
         val blockEntity = level.getBlockEntity(pos) as? CopycatFenceWallBlockEntity ?: return InteractionResult.PASS
-        val slot = partAt(state, context).slot
+        val slot = slotFromContext(state, context)
 
         if (!blockEntity.hasCustomMaterial(slot)) {
             return InteractionResult.PASS
@@ -266,7 +334,11 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         val offhand = placer.getItemInHand(InteractionHand.OFF_HAND)
         val applied = getAcceptedBlockState(level, pos, offhand, Direction.orderedByNearest(placer)[0]) ?: return
         val blockEntity = level.getBlockEntity(pos) as? CopycatFenceWallBlockEntity ?: return
-        val slot = if (state.getValue(UP)) CopycatFenceWallBlockEntity.Slot.PRIMARY else CopycatFenceWallBlockEntity.Slot.SECONDARY
+        val slot = if (state.getValue(UP)) {
+            CopycatFenceWallBlockEntity.WallSlot.POST
+        } else {
+            firstConnectedWallSlot(state) ?: CopycatFenceWallBlockEntity.WallSlot.POST
+        }
         if (blockEntity.hasCustomMaterial(slot)) return
 
         blockEntity.setSlotMaterial(slot, applied, offhand)
@@ -286,17 +358,12 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         fromPos: BlockPos?
     ): BlockState {
         val be = level.getBlockEntity(toPos) as? CopycatFenceWallBlockEntity ?: return state
-        val primary = be.getSlotMaterial(CopycatFenceWallBlockEntity.Slot.PRIMARY)
-        val secondary = be.getSlotMaterial(CopycatFenceWallBlockEntity.Slot.SECONDARY)
-
-        if (!state.getValue(UP)) {
-            return secondary
-        }
+        val primary = be.getSlotMaterial(CopycatFenceWallBlockEntity.WallSlot.POST)
 
         if (side.axis.isHorizontal) {
             val wallSide = state.getValue(wallProperty(side))
             if (wallSide != WallSide.NONE) {
-                return secondary
+                return be.getSlotMaterial(wallSlot(side))
             }
         }
 
@@ -452,21 +519,91 @@ class CopycatWallBlock(props: Properties) : CopycatSimpleWaterloggedBlock(props)
         }
     }
 
-    private fun partAt(state: BlockState, hit: BlockHitResult, pos: BlockPos): Part {
-        if (!state.getValue(UP)) return Part.SIDE
-        val x = hit.location.x - pos.x
-        val z = hit.location.z - pos.z
-        val center = x in 0.24..0.76 && z in 0.24..0.76
-        return if (center) Part.CENTER else Part.SIDE
+    fun slotFromHit(state: BlockState, hit: BlockHitResult): CopycatFenceWallBlockEntity.WallSlot =
+        slotFromLocal(
+            state,
+            hit.location.x - hit.blockPos.x,
+            hit.location.y - hit.blockPos.y,
+            hit.location.z - hit.blockPos.z,
+            hit.direction
+        )
+
+    fun slotBoxes(state: BlockState, pos: BlockPos): List<SlotBox> =
+        slotBoxesLocal(state).map { (slot, box) -> SlotBox(slot, box.toWorldAabb(pos)) }
+
+    private fun slotFromContext(state: BlockState, context: UseOnContext): CopycatFenceWallBlockEntity.WallSlot =
+        slotFromLocal(
+            state,
+            context.clickLocation.x - context.clickedPos.x,
+            context.clickLocation.y - context.clickedPos.y,
+            context.clickLocation.z - context.clickedPos.z,
+            context.clickedFace
+        )
+
+    private fun slotFromLocal(
+        state: BlockState,
+        relX: Double,
+        relY: Double,
+        relZ: Double,
+        face: Direction
+    ): CopycatFenceWallBlockEntity.WallSlot {
+        val eps = 1.0e-4
+        val x = (relX - face.stepX * eps).coerceIn(eps, 1.0 - eps)
+        val y = (relY - face.stepY * eps).coerceIn(eps, 1.0 - eps)
+        val z = (relZ - face.stepZ * eps).coerceIn(eps, 1.0 - eps)
+        val boxes = slotBoxesLocal(state)
+
+        val containing = boxes.filter { (_, box) -> box.contains(x, y, z) }
+        if (containing.isNotEmpty()) {
+            return containing.minWith(
+                compareBy<Pair<CopycatFenceWallBlockEntity.WallSlot, LocalBox>> { slotPriority(it.first) }
+                    .thenBy { it.second.distanceSquaredTo(x, y, z) }
+            ).first
+        }
+
+        return boxes.minByOrNull { (_, box) -> box.distanceSquaredTo(x, y, z) }?.first
+            ?: firstConnectedWallSlot(state)
+            ?: CopycatFenceWallBlockEntity.WallSlot.POST
     }
 
-    private fun partAt(state: BlockState, context: UseOnContext): Part {
-        if (!state.getValue(UP)) return Part.SIDE
-        val pos = context.clickedPos
-        val hit = context.clickLocation
-        val x = hit.x - pos.x
-        val z = hit.z - pos.z
-        val center = x in 0.24..0.76 && z in 0.24..0.76
-        return if (center) Part.CENTER else Part.SIDE
+    private fun slotBoxesLocal(state: BlockState): List<Pair<CopycatFenceWallBlockEntity.WallSlot, LocalBox>> {
+        val boxes = mutableListOf<Pair<CopycatFenceWallBlockEntity.WallSlot, LocalBox>>()
+        if (state.getValue(UP)) {
+            boxes += CopycatFenceWallBlockEntity.WallSlot.POST to CENTER_BOX
+        }
+        for (direction in Direction.Plane.HORIZONTAL) {
+            val wallSide = state.getValue(wallProperty(direction))
+            val box = when (wallSide) {
+                WallSide.NONE -> null
+                WallSide.LOW -> LOW_SIDE_BOXES[direction]
+                WallSide.TALL -> TALL_SIDE_BOXES[direction]
+            } ?: continue
+            boxes += wallSlot(direction) to box
+        }
+        return boxes
+    }
+
+    private fun slotPriority(slot: CopycatFenceWallBlockEntity.WallSlot): Int =
+        when (slot) {
+            CopycatFenceWallBlockEntity.WallSlot.POST -> 1
+            else -> 0
+        }
+
+    private fun wallSlot(direction: Direction): CopycatFenceWallBlockEntity.WallSlot =
+        when (direction) {
+            Direction.NORTH -> CopycatFenceWallBlockEntity.WallSlot.NORTH
+            Direction.EAST -> CopycatFenceWallBlockEntity.WallSlot.EAST
+            Direction.SOUTH -> CopycatFenceWallBlockEntity.WallSlot.SOUTH
+            Direction.WEST -> CopycatFenceWallBlockEntity.WallSlot.WEST
+            else -> CopycatFenceWallBlockEntity.WallSlot.POST
+        }
+
+    private fun firstConnectedWallSlot(state: BlockState): CopycatFenceWallBlockEntity.WallSlot? {
+        for (direction in Direction.Plane.HORIZONTAL) {
+            if (state.getValue(wallProperty(direction)) != WallSide.NONE) {
+                return wallSlot(direction)
+            }
+        }
+        return null
     }
 }

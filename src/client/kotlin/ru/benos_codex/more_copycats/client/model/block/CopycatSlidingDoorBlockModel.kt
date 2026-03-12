@@ -26,9 +26,7 @@ class CopycatSlidingDoorBlockModel(state: BlockState, unbaked: BlockStateModel.U
         random: RandomSource,
         parts: MutableList<BlockModelPart>
     ) {
-        val material = resolveMaterial(world, pos, state)
-
-        val refs = collectMaterialReferences(world, pos, material, random)
+        val (material, refs) = resolveMaterialAndReferences(world, pos, state, random)
         val templateParts = mutableListOf<BlockModelPart>()
         model.collectParts(random, templateParts)
 
@@ -36,7 +34,7 @@ class CopycatSlidingDoorBlockModel(state: BlockState, unbaked: BlockStateModel.U
             val builder = QuadCollection.Builder()
             addPartRemapped(templatePart, builder, refs, state, material, world, pos)
             // Sliding door geometry should keep world AO to avoid looking brighter than nearby blocks when closed.
-            parts += SimpleModelWrapper(builder.build(), true, templatePart.particleIcon())
+            parts += SimpleModelWrapper(builder.build(), MaterialSlotDebug.ambientOcclusion(true), templatePart.particleIcon())
         }
     }
 
@@ -53,15 +51,30 @@ class CopycatSlidingDoorBlockModel(state: BlockState, unbaked: BlockStateModel.U
     }
 
     override fun particleSpriteWithInfo(world: BlockAndTintGetter, pos: BlockPos, state: BlockState): TextureAtlasSprite {
-        val material = resolveMaterial(world, pos, state)
+        val material = resolveMaterialAndReferences(world, pos, state, null).first
         return getModelOf(material).particleIcon()
     }
 
-    private fun resolveMaterial(world: BlockAndTintGetter, pos: BlockPos, state: BlockState): BlockState {
+    private fun resolveMaterialAndReferences(
+        world: BlockAndTintGetter,
+        pos: BlockPos,
+        state: BlockState,
+        random: RandomSource?
+    ): Pair<BlockState, Map<Direction, BakedQuad>> {
         val bePos = if (state.getValue(DoorBlock.HALF) == DoubleBlockHalf.UPPER) pos.below() else pos
         val half = state.getValue(DoorBlock.HALF)
-        return (world.getBlockEntity(bePos) as? CopycatSlidingDoorBlockEntity)?.getMaterialState(half)
-            ?: AllBlocks.COPYCAT_BASE.defaultBlockState()
+        val blockEntity = world.getBlockEntity(bePos) as? CopycatSlidingDoorBlockEntity
+        val fallback = blockEntity?.getMaterialState(half) ?: AllBlocks.COPYCAT_BASE.defaultBlockState()
+        val hasCustom = blockEntity?.hasCustomMaterial(half) == true
+        val material = MaterialSlotDebug.material(half.ordinal, hasCustom, fallback)
+        val refs = if (random != null) {
+            MaterialSlotDebug.references(half.ordinal, hasCustom) {
+                collectMaterialReferences(world, pos, it, random)
+            } ?: collectMaterialReferences(world, pos, material, random)
+        } else {
+            emptyMap()
+        }
+        return material to refs
     }
 
     private fun collectMaterialReferences(
@@ -106,7 +119,9 @@ class CopycatSlidingDoorBlockModel(state: BlockState, unbaked: BlockStateModel.U
     ) {
         for (quad in templatePart.getQuads(null)) {
             val ref = refs[quad.direction()]
-            builder.addUnculledFace(CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material))
+            val remapped = CopycatConnectedTextureHelper.remapQuad(quad, ref?.sprite(), ref, world, pos, state, material)
+            if (CopycatQuadCulling.isOnOuterBoundary(quad, quad.direction())) builder.addCulledFace(quad.direction(), remapped)
+            else builder.addUnculledFace(remapped)
         }
 
         for (direction in Direction.entries) {

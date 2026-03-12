@@ -1,0 +1,34 @@
+{
+    "multipart": [
+        {
+            "when": { "axis": "x" },
+            "apply": { "model": "more_copycats:block/cogwheel", "z": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y" },
+            "apply": { "model": "more_copycats:block/cogwheel", "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z" },
+            "apply": { "model": "more_copycats:block/cogwheel", "x": 90, "uvlock": true }
+        },
+    
+    
+        {
+            "when": { "axis": "x" },
+            "apply": { "model": "more_copycats:block/shaft/normal", "z": 90, "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "y" },
+            "apply": { "model": "more_copycats:block/shaft/normal", "uvlock": true }
+        },
+    
+        {
+            "when": { "axis": "z" },
+            "apply": { "model": "more_copycats:block/shaft/normal", "x": 90, "uvlock": true }
+        }
+    ]
+}

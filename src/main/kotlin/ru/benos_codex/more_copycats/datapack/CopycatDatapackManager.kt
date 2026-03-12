@@ -12,11 +12,14 @@ import org.slf4j.LoggerFactory
 
 object CopycatDatapackManager {
     private const val BLOCK_DEFINITION_PATH = "blocks"
+    private const val MAT_COUNT_PATH = "mat_count.json"
     private const val MAX_REDSTONE_HOLD_TICKS = 20 * 60
 
     private val logger = LoggerFactory.getLogger("MoreCopycats/Datapack")
     @Volatile
     private var definitionsByTarget: Map<Identifier, CopycatBlockDefinition> = emptyMap()
+    @Volatile
+    private var matCountByTarget: Map<Identifier, Int> = emptyMap()
 
     fun init() {
         ServerLifecycleEvents.END_DATA_PACK_RELOAD.register(
@@ -41,6 +44,11 @@ object CopycatDatapackManager {
     fun redstoneHoldTicksFor(blockState: BlockState): Int? =
         definitionFor(blockState)?.server?.redstoneHoldTicks
 
+    fun matCountFor(blockState: BlockState): Int {
+        val blockId = BuiltInRegistries.BLOCK.getKey(blockState.block)
+        return matCountByTarget[blockId]?.coerceAtLeast(1) ?: 1
+    }
+
     private fun load(resourceManager: ResourceManager) {
         val loaded = LinkedHashMap<Identifier, CopycatBlockDefinition>()
         val resources = resourceManager.listResources(BLOCK_DEFINITION_PATH) { id -> id.path.endsWith(".json") }
@@ -60,7 +68,9 @@ object CopycatDatapackManager {
         }
 
         definitionsByTarget = loaded
+        matCountByTarget = loadMatCounts(resourceManager)
         logger.info("Loaded {} More Copycats block definition(s) from datapacks", loaded.size)
+        logger.info("Loaded {} More Copycats mat_count override(s) from datapacks", matCountByTarget.size)
     }
 
     private fun parseDefinition(resourceId: Identifier, root: JsonObject): CopycatBlockDefinition? {
@@ -135,5 +145,34 @@ object CopycatDatapackManager {
         } catch (_: Exception) {
             null
         }
+    }
+
+    private fun loadMatCounts(resourceManager: ResourceManager): Map<Identifier, Int> {
+        val result = LinkedHashMap<Identifier, Int>()
+        val resources = resourceManager.listResources("") { id -> id.path.endsWith(MAT_COUNT_PATH) }
+        for ((resourceId, resource) in resources) {
+            val root = try {
+                resource.openAsReader().use { reader ->
+                    JsonParser.parseReader(reader).asJsonObject
+                }
+            } catch (error: Exception) {
+                logger.warn("Failed to parse mat_count file {}", resourceId, error)
+                continue
+            }
+
+            for ((key, value) in root.entrySet()) {
+                val blockId = runCatching { Identifier.parse(key) }.getOrNull()
+                if (blockId == null) {
+                    logger.warn("Skipping invalid block id '{}' in {}", key, resourceId)
+                    continue
+                }
+                if (!value.isJsonPrimitive || !value.asJsonPrimitive.isNumber) {
+                    logger.warn("Skipping non-numeric mat count for '{}' in {}", key, resourceId)
+                    continue
+                }
+                result[blockId] = value.asInt.coerceAtLeast(1)
+            }
+        }
+        return result
     }
 }
